@@ -11,7 +11,20 @@ const LANGUAGES = [
   { label: "ગુજરાતી", code: "gu-IN" }, { label: "ਪੰਜਾਬੀ", code: "pa-IN" }
 ];
 const WEBHOOK_URL = process.env.EXPO_PUBLIC_N8N_WEBHOOK_URL ?? "";
-type Advice = { answer?: string; summary?: string; fruit?: string; title?: string; benefits?: string[]; cautions?: string[]; audio_url?: string; [key: string]: unknown };
+type Advice = { fruit?: string; gi?: number; gl?: number; season?: string; best_time?: string; diabetic_safety?: string; pairing_tip?: string; portion?: string; renal_safety?: string; potassium?: number; hypertension_safety?: string; ckd_safety?: string; spoken_response?: string; audio_url?: string; image_url?: string; description?: string; language_code?: string; language?: string; [key: string]: unknown };
+function normalizeResponse(raw: any): Advice | null {
+  let value = raw;
+  for (let i = 0; i < 4; i++) {
+    if (typeof value === "string") { try { value = JSON.parse(value); } catch { return null; } continue; }
+    if (Array.isArray(value)) { value = value[0]; continue; }
+    if (value && typeof value === "object" && !("fruit" in value) && !("spoken_response" in value)) {
+      const inner = value.output ?? value.json ?? value.data ?? value.body;
+      if (inner !== undefined) { value = inner; continue; }
+    }
+    break;
+  }
+  return value && typeof value === "object" && Object.keys(value).length ? value as Advice : null;
+}
 
 export default function App() {
   const [language, setLanguage] = useState(LANGUAGES[0]);
@@ -31,10 +44,12 @@ export default function App() {
     if (!WEBHOOK_URL) { setError("Set EXPO_PUBLIC_N8N_WEBHOOK_URL in .env before asking."); return; }
     setLoading(true); setError(""); setAnswer(null);
     try {
-      const res = await fetch(WEBHOOK_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: question.trim(), language: activeLanguage, language_code: activeLanguage }) });
+      const res = await fetch(WEBHOOK_URL, { method: "POST", headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" }, body: JSON.stringify({ query: question.trim(), language: activeLanguage }) });
       if (!res.ok) throw new Error(`Request failed (${res.status}).`);
-      const data = await res.json();
-      setAnswer((data?.data ?? data?.result ?? data) as Advice);
+      const raw = await res.text();
+      const data = normalizeResponse(raw);
+      if (!data) throw new Error("FruitBuddie returned an answer we couldn't read.");
+      setAnswer(data);
     } catch (e) { setError(e instanceof Error ? e.message : "Something went wrong."); }
     finally { setLoading(false); }
   }
@@ -72,10 +87,15 @@ export default function App() {
       {!!error && <Text style={s.error}>{error}</Text>}
       {answer && <View style={s.answer}>
         <Text style={s.eyebrow}>YOUR FRUITBUDDIE INSIGHT</Text>
-        <Text style={s.answerTitle}>{String(answer.title ?? answer.fruit ?? "Your fruit insight")}</Text>
-        {(typeof answer.answer === "string" || typeof answer.summary === "string") && <Text style={s.answerBody}>{String(answer.answer ?? answer.summary)}</Text>}
-        {!!answer.benefits?.length && <View style={s.list}><Text style={s.label}>GOOD TO KNOW</Text>{answer.benefits.map((x,i)=><Text key={i} style={s.bullet}>• {x}</Text>)}</View>}
-        {!!answer.cautions?.length && <View style={s.list}><Text style={s.label}>A LITTLE CAUTION</Text>{answer.cautions.map((x,i)=><Text key={i} style={s.bullet}>• {x}</Text>)}</View>}
+        <Text style={s.answerTitle}>{String(answer.fruit ?? "Your fruit insight")}</Text>
+        {!!answer.description && <Text style={s.answerBody}>{answer.description}</Text>}
+        <View style={s.metrics}>
+          {answer.gi !== undefined && <View style={s.metric}><Text style={s.metricLabel}>GLYCAEMIC INDEX</Text><Text style={s.metricValue}>{answer.gi}</Text></View>}
+          {answer.gl !== undefined && <View style={s.metric}><Text style={s.metricLabel}>GLYCAEMIC LOAD</Text><Text style={s.metricValue}>{answer.gl}</Text></View>}
+          {answer.potassium !== undefined && <View style={s.metric}><Text style={s.metricLabel}>POTASSIUM</Text><Text style={s.metricValue}>{answer.potassium}</Text></View>}
+        </View>
+        {([["DIABETES", answer.diabetic_safety], ["PORTION", answer.portion], ["BEST TIME", answer.best_time], ["SEASON", answer.season], ["PAIRING TIP", answer.pairing_tip], ["KIDNEY / RENAL SAFETY", answer.renal_safety ?? answer.ckd_safety], ["BLOOD PRESSURE", answer.hypertension_safety]] as const).filter(([,v]) => !!v).map(([label,value]) => <View key={label} style={s.list}><Text style={s.label}>{label}</Text><Text style={s.bullet}>{String(value)}</Text></View>)}
+        {!!answer.spoken_response && <Text style={s.answerBody}>{answer.spoken_response}</Text>}
         {!!answer.audio_url && <TouchableOpacity style={s.audio} onPress={playAudio}><Text style={s.audioText}>▶  Listen to the answer</Text></TouchableOpacity>}
       </View>}
       <View style={s.disclaimer}><Text style={s.disclaimerTitle}>A helpful companion, not a doctor.</Text><Text style={s.disclaimerText}>FruitBuddie provides general nutrition information, not medical advice. For personal dietary needs or medical conditions, consult a qualified healthcare professional.</Text></View>
@@ -97,7 +117,7 @@ const s = StyleSheet.create({
  ask:{flex:1,backgroundColor:"#D8C27F",borderRadius:13,minHeight:48,justifyContent:"center",alignItems:"center",paddingHorizontal:10},askText:{color:"#10271E",fontWeight:"800",fontSize:13},
  error:{color:"#FFB6A8",marginTop:14,lineHeight:20},answer:{marginTop:20,padding:20,borderRadius:20,backgroundColor:"#15352A",borderWidth:1,borderColor:"#41644F"},
  answerTitle:{color:"#F4EEDC",fontSize:23,fontWeight:"800",marginTop:10},answerBody:{color:"#D6E1D8",fontSize:14,lineHeight:22,marginTop:12},list:{marginTop:17},bullet:{color:"#D6E1D8",fontSize:13,lineHeight:21,marginTop:4},
- audio:{alignSelf:"flex-start",marginTop:18,borderRadius:20,backgroundColor:"#D8C27F",paddingHorizontal:15,paddingVertical:10},audioText:{color:"#10271E",fontWeight:"800",fontSize:12},
+ metrics:{flexDirection:"row",flexWrap:"wrap",gap:8,marginTop:16},metric:{backgroundColor:"#0D261E",borderRadius:12,padding:12,minWidth:90},metricLabel:{color:"#AFC2B6",fontSize:9,fontWeight:"700"},metricValue:{color:"#F4EEDC",fontSize:20,fontWeight:"800",marginTop:4},audio:{alignSelf:"flex-start",marginTop:18,borderRadius:20,backgroundColor:"#D8C27F",paddingHorizontal:15,paddingVertical:10},audioText:{color:"#10271E",fontWeight:"800",fontSize:12},
  disclaimer:{marginTop:25,padding:16,borderLeftWidth:2,borderLeftColor:"#C9B36F",backgroundColor:"#0D261E"},disclaimerTitle:{color:"#E7D8AA",fontSize:12,fontWeight:"800",marginBottom:6},disclaimerText:{color:"#AFC2B6",fontSize:11,lineHeight:18},
  footer:{color:"#607D6D",textAlign:"center",fontSize:9,letterSpacing:2,marginTop:24}
 });
