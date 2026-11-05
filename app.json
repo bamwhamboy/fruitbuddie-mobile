@@ -1,0 +1,8 @@
+{
+  "expo": {
+    "name":"FruitBuddie", "slug":"fruitbuddie", "version":"1.0.0", "orientation":"portrait", "userInterfaceStyle":"dark",
+    "ios":{"supportsTablet":true,"infoPlist":{"NSMicrophoneUsageDescription":"FruitBuddie uses your microphone for voice questions.","NSSpeechRecognitionUsageDescription":"FruitBuddie converts spoken questions into text."}},
+    "android":{"permissions":["RECORD_AUDIO"]},
+    "plugins":[["expo-speech-recognition",{"microphonePermission":"Allow FruitBuddie to use your microphone.","speechRecognitionPermission":"Allow FruitBuddie to recognize your speech."}]]
+  }
+}
