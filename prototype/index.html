@@ -77,7 +77,7 @@ function renderStructured(data){
  const stats=node("div","result-stats");addStat(stats,"Glycemic index (GI)",d.gi);addStat(stats,"Glycemic load (GL)",d.gl);addStat(stats,"Best time",d.best_time);addStat(stats,"Season",d.season);if(stats.childElementCount)result.append(stats);
  if(d.pairing_tip){const detail=node("div","result-detail");detail.append(node("b",null,"A helpful pairing tip"),node("p",null,d.pairing_tip));result.append(detail);}
  if(d.spoken_response){const spoken=node("div","result-text");spoken.append(node("p",null,d.spoken_response));result.append(spoken);}
- if(typeof d.audio_url==="string"&&(/^(data:audio\\/|https?:\\/\\/)/i).test(d.audio_url)){
+ if(typeof d.audio_url==="string"&&(/^(data:audio\/|https?:\/\/)/i).test(d.audio_url)){
   const wrap=node("div","result-audio"),audio=node("audio");audio.controls=true;audio.preload="auto";audio.src=d.audio_url;
   const play=node("button","primary","▶ Play response");play.type="button";play.style.marginBottom="10px";
   play.addEventListener("click",async()=>{try{await audio.play();play.textContent="↻ Replay response";}catch{play.textContent="Audio unavailable — use the player below";}});
