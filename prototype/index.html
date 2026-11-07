@@ -20,6 +20,25 @@ header{height:82px;display:flex;align-items:center;justify-content:space-between
 @media(max-width:900px){.wrap{padding:0 24px 50px}.grid{grid-template-columns:280px minmax(0,1fr)}.hero{padding:35px}.hero-art{width:210px}.fruit-orbit{width:170px;height:170px;font-size:90px}}
 @media(max-width:720px){.wrap{padding:0 16px 40px}.grid{grid-template-columns:1fr}.profile{position:static;order:2}.main{order:1}.hero{min-height:235px;padding:30px 26px}.hero-art{width:150px;height:160px}.fruit-orbit{width:135px;height:135px;font-size:74px}.leaf{font-size:40px}.hero h1{font-size:40px}.hero p{font-size:12px}.navnote{display:none}}
 @media(max-width:500px){header{height:70px}.hero{margin:20px 0;border-radius:21px;padding:26px 21px;min-height:215px}.hero-art{width:95px;height:120px}.fruit-orbit{width:100px;height:100px;font-size:55px}.leaf{font-size:29px;right:-3px}.hero h1{font-size:34px}.hero p{font-size:11px;max-width:280px}.eyebrow{font-size:9px}.card{padding:19px;border-radius:18px}.ask{padding:20px}.ask h2{font-size:22px}.ask .sub{margin-left:0}.prompt{flex-wrap:wrap;padding:10px 12px}.prompt input{flex-basis:100%;padding:7px 0}.prompt .primary{width:100%}.underprompt{align-items:flex-start;gap:8px;flex-direction:column}.insights{grid-template-columns:1fr}.insight{display:grid;grid-template-columns:30px 1fr;column-gap:8px;padding:13px}.insighticon{grid-row:span 2;margin:0}.insight b{margin:0}.fruitgrid{grid-template-columns:repeat(4,1fr);gap:7px}.fruit{padding:10px 4px}.fruit .emoji{width:40px;height:40px;font-size:23px}.fruit b{font-size:10px}.fruit small{font-size:8px}}
+
+/* Structured FruitBuddie response */
+.answer.structured{padding:0;overflow:hidden;background:#fffefa}
+.result-hero{display:flex;gap:16px;align-items:center;padding:18px;background:#f2f5ec}
+.result-hero img{width:88px;height:88px;object-fit:cover;border-radius:14px;background:#e9eddf}
+.result-hero h3{font-family:'Playfair Display',serif;font-size:21px;margin:0 0 6px;color:var(--forest)}
+.result-hero .safety{font-size:11px;line-height:1.5;color:#536458;margin:0}
+.result-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding:15px 18px}
+.result-stat{background:#f6f6ef;border:1px solid #e9ebdf;border-radius:11px;padding:11px}
+.result-stat b{display:block;font-size:10px;color:var(--forest);margin-bottom:5px}
+.result-stat span{font-size:12px;color:#536458;line-height:1.5}
+.result-detail{padding:0 18px 15px}
+.result-detail b{display:block;font-size:11px;color:var(--forest);margin:0 0 5px}
+.result-detail p{font-size:12px;line-height:1.65;color:#536458;margin:0}
+.result-audio{padding:0 18px 18px}
+.result-audio audio{width:100%;height:38px}
+.result-text{padding:0 18px 15px}
+.result-text p{font-size:12px;line-height:1.7;color:#536458;margin:0}
+@media(max-width:500px){.result-hero img{width:72px;height:72px}.result-hero h3{font-size:18px}}
 </style>
 </head>
 <body><div class="wrap">
@@ -43,10 +62,50 @@ header{height:82px;display:flex;align-items:center;justify-content:space-between
 <section class="card fruitsection"><div class="sectionhead"><h2>A colourful place to start</h2><span>Explore common fruits</span></div><div class="fruitgrid"><div class="fruit"><div class="emoji">🍎</div><b>Apple</b><small>Fibre</small></div><div class="fruit"><div class="emoji">🍌</div><b>Banana</b><small>Potassium</small></div><div class="fruit"><div class="emoji">🥭</div><b>Mango</b><small>Portion size</small></div><div class="fruit"><div class="emoji">🍊</div><b>Orange</b><small>Vitamin C</small></div><div class="fruit"><div class="emoji">🍐</div><b>Guava</b><small>Fibre</small></div><div class="fruit"><div class="emoji">🍉</div><b>Watermelon</b><small>Serving size</small></div><div class="fruit"><div class="emoji">🍍</div><b>Pineapple</b><small>Carbohydrates</small></div><div class="fruit"><div class="emoji">❤️</div><b>Pomegranate</b><small>Fibre</small></div></div><p class="disclaimer">FruitBuddie provides general nutrition information, not a medical diagnosis or a replacement for advice from your healthcare professional. Kidney-related food choices can depend on kidney function, lab results and your prescribed diet.</p></section>
 </main></div><footer class="footer">FruitBuddie&nbsp; · &nbsp;Better-informed choices, one serving at a time.</footer></div>
 <script>
-(()=>{const form=document.getElementById("ask-form"),input=document.getElementById("question-input"),button=document.getElementById("ask-button"),language=document.getElementById("language-select"),result=document.getElementById("ask-result"),suggestions=document.querySelectorAll(".suggestion");const selected=()=>Array.from(document.querySelectorAll('input[name="condition"]:checked')).map(x=>x.value);const goal=()=>document.getElementById("goal").value;
-function display(message,error=false){result.classList.add("show");result.querySelector("h3").textContent=error?"Unable to get an answer":"FruitBuddie says";result.querySelector("p").textContent=message}
-function extract(data){if(typeof data==="string")return data;if(data==null)return"No response was returned.";if(Array.isArray(data))return data.map(extract).join("\n\n");if(typeof data==="object"){for(const key of["output","response","answer","text","message","result"])if(data[key]!=null)return extract(data[key]);return JSON.stringify(data,null,2)}return String(data)}
-async function ask(event){event?.preventDefault();const query=input.value.trim();if(!query){display("Please enter a question first.",true);return}button.disabled=true;button.textContent="Thinking…";display("Considering your health profile…");try{const response=await fetch("/api/ask",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({query,language:language.value,health_conditions:selected(),goal:goal()})});const raw=await response.text();let data;try{data=JSON.parse(raw)}catch{data=raw}if(!response.ok)throw new Error(typeof data==="string"?data:(data.error||data.message||"Request failed ("+response.status+")"));display(extract(data))}catch(error){display(error.message||"Unable to reach FruitBuddie. Please try again.",true)}finally{button.disabled=false;button.textContent="Ask FruitBuddie ↗"}}
-form.addEventListener("submit",ask);suggestions.forEach(b=>b.addEventListener("click",()=>{input.value=b.textContent;input.focus()}));
+(()=>{
+const form=document.getElementById("ask-form"),input=document.getElementById("question-input"),button=document.getElementById("ask-button"),language=document.getElementById("language-select"),result=document.getElementById("ask-result"),suggestions=document.querySelectorAll(".suggestion");
+const selected=()=>Array.from(document.querySelectorAll('input[name="condition"]:checked')).map(x=>x.value);
+const goal=()=>document.getElementById("goal").value;
+function clearResult(){result.replaceChildren();result.classList.add("show","structured");}
+function node(tag,className,text){const el=document.createElement(tag);if(className)el.className=className;if(text!=null)el.textContent=String(text);return el;}
+function displayMessage(message,error=false){result.classList.remove("structured");result.replaceChildren();result.classList.add("show");const h=node("h3",null,error?"Unable to get an answer":"FruitBuddie");const p=node("p",null,message);result.append(h,p);}
+function parsePayload(data){
+ if(typeof data==="string"){const s=data.trim();if((s.startsWith("{")&&s.endsWith("}"))||(s.startsWith("[")&&s.endsWith("]"))){try{return parsePayload(JSON.parse(s))}catch{}}return data;}
+ if(Array.isArray(data)){for(const item of data){const found=parsePayload(item);if(found&&typeof found==="object"&&!Array.isArray(found))return found;}return data;}
+ if(data&&typeof data==="object"){
+  for(const key of ["output","response","answer","result","data"])if(data[key]!=null){const found=parsePayload(data[key]);if(found&&typeof found==="object"&&!Array.isArray(found))return found;}
+ }
+ return data;
+}
+function addStat(container,label,value){if(value==null||value==="")return;const box=node("div","result-stat");box.append(node("b",null,label),node("span",null,value));container.append(box);}
+function renderStructured(data){
+ const d=parsePayload(data);
+ if(!d||typeof d!=="object"||Array.isArray(d)||(!d.fruit&&!d.spoken_response&&!d.diabetic_safety))return false;
+ clearResult();
+ const hero=node("div","result-hero");
+ if(typeof d.image_url==="string"&&/^https?:\/\//i.test(d.image_url)){const img=node("img");img.src=d.image_url;img.alt=d.fruit||"Fruit";img.onerror=()=>img.remove();hero.append(img);}
+ const intro=node("div");intro.append(node("h3",null,d.fruit||"Your fruit guide"));if(d.diabetic_safety)intro.append(node("p","safety",d.diabetic_safety));hero.append(intro);result.append(hero);
+ const stats=node("div","result-stats");addStat(stats,"Glycemic index (GI)",d.gi);addStat(stats,"Glycemic load (GL)",d.gl);addStat(stats,"Best time",d.best_time);addStat(stats,"Season",d.season);if(stats.childElementCount)result.append(stats);
+ if(d.pairing_tip){const detail=node("div","result-detail");detail.append(node("b",null,"A helpful pairing tip"),node("p",null,d.pairing_tip));result.append(detail);}
+ if(d.spoken_response){const spoken=node("div","result-text");spoken.append(node("p",null,d.spoken_response));result.append(spoken);}
+ if(typeof d.audio_url==="string"&&/^data:audio\//i.test(d.audio_url)){const wrap=node("div","result-audio");const audio=node("audio");audio.controls=true;audio.preload="none";audio.src=d.audio_url;wrap.append(audio);result.append(wrap);}
+ return true;
+}
+async function ask(event){
+ event?.preventDefault();const query=input.value.trim();if(!query){displayMessage("Please enter a question first.",true);return;}
+ button.disabled=true;button.textContent="Thinking…";displayMessage("Considering your health profile…");
+ try{
+  const response=await fetch("/api/ask",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({query,language:language.value,health_conditions:selected(),goal:goal()})});
+  const raw=await response.text();let data;try{data=JSON.parse(raw)}catch{data=raw;}
+  if(!response.ok)throw new Error(typeof data==="string"?data:(data.error||data.message||"Request failed ("+response.status+")"));
+  if(!renderStructured(data)){
+   const d=parsePayload(data);const message=typeof d==="string"?d:(d?.spoken_response||d?.message||d?.text||"FruitBuddie returned a response in an unexpected format.");
+   displayMessage(message);
+  }
+ }catch(error){displayMessage(error.message||"Unable to reach FruitBuddie. Please try again.",true);}
+ finally{button.disabled=false;button.textContent="Ask FruitBuddie ↗";}
+}
+form.addEventListener("submit",ask);
+suggestions.forEach(b=>b.addEventListener("click",()=>{input.value=b.textContent;input.focus();}));
 })();
 </script></body></html>
