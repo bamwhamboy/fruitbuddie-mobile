@@ -22,7 +22,64 @@
 .condition-result.verdict-caution:before{background:#d65e4938}
 .condition-result.verdict-caution .report-section-kicker,.condition-result.verdict-caution .condition-status{color:#ffad98}
 .answer-language{font-size:12px;color:#c5d6c8;display:flex;gap:7px;align-items:center;padding:8px 4px}
-</style></head><body><div class="shell"><div class="workspace"><section class="left"><div class="brand"><span class="brand-icon">✿</span><span>FruitBuddie</span></div><h1>Your family's friendly guide to <span>healthy fruit choices.</span></h1><p class="intro">Just ask in your native language to find out which fruits are best for your whole family.</p><div class="tags"><span class="tag">Diabetes friendly</span><span class="tag">Kidney health</span><span class="tag">Cholesterol &amp; BP</span><span class="tag">Practical portions</span></div><section class="ask"><form id="ask-form"><div class="prompt"><input id="question-input" type="text" placeholder="Ask about guava, mango, or any fruit..." autocomplete="off" required></div><div class="prompt-bottom"><div class="answer-language"><span>✧ Replies in your question’s language</span></div><div style="display:flex;align-items:center;gap:8px"><button class="mic-button" id="mic-button" type="button" aria-label="Speak your question">♩</button><button class="primary" id="ask-button" type="submit">Ask FruitBuddie ↗</button></div></div><p id="voice-status" class="voice-status"></p></form></section><div class="try-area"><div class="section-label">TRY A FRUIT</div><div class="fruit-list"><button class="fruit-choice active" data-fruit="Guava"><span class="fruit-thumb">🍈</span><span><span class="fruit-name">Guava</span><span class="fruit-sub">Amrood / Jama</span></span></button><button class="fruit-choice" data-fruit="Mango"><span class="fruit-thumb">🥭</span><span><span class="fruit-name">Mango</span><span class="fruit-sub">Aam / Amba</span></span></button><button class="fruit-choice" data-fruit="Jamun"><span class="fruit-thumb">🫐</span><span><span class="fruit-name">Jamun</span><span class="fruit-sub">Java plum / Kala jamun</span></span></button><button class="fruit-choice" data-fruit="Papaya"><span class="fruit-thumb">🍈</span><span><span class="fruit-name">Papaya</span><span class="fruit-sub">Papita / Pappali</span></span></button><button class="fruit-choice" data-fruit="Orange"><span class="fruit-thumb">🍊</span><span><span class="fruit-name">Orange</span><span class="fruit-sub">Santra / Kamala</span></span></button></div></div></section><section class="right"><div class="report-top"><span class="report-label">✧ CLINICAL HEALTH REPORT</span><span class="source-pill">Evidence-led · <b>Sources shown with answers</b></span></div><div id="report-empty" class="report-empty"><div class="symbol">✿</div><h2>Your fruit report starts here</h2><p>Ask about a fruit or choose one from the list. Your report will bring together nutrition facts, relevant health considerations and evidence.</p></div><div id="ask-result" class="answer" aria-live="polite"></div></section></div><p class="disclaimer">FruitBuddie provides general nutrition information, not a medical diagnosis or a replacement for advice from your doctor or dietitian.</p></div><script>
+/* Refined FruitBuddie UI */
+:root{--ink:#202c25;--forest:#244c38;--forest2:#183b2b;--paper:#f8f8f4;--muted:#758078;--line:#e5e9e1}
+html,body{background:#f8f8f4;color:var(--ink)}
+body{font-family:'DM Sans',sans-serif;background:linear-gradient(180deg,#f2f5ee 0,#fafaf7 400px)}
+.shell{max-width:1240px;padding:30px 34px 36px}
+.workspace{max-width:1160px;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:26px;align-items:start}
+.brand{font:800 22px Manrope,sans-serif;letter-spacing:-.7px;margin:0 0 48px}
+.brand-icon{width:38px;height:38px;border-radius:12px;box-shadow:none}
+h1{font:700 clamp(36px,4vw,50px)/1.08 'Playfair Display',serif;letter-spacing:-1px;color:#213c2c}
+h1 span{color:#78915c}
+.intro{font-size:14px;line-height:1.75;color:#68756b}
+.tags{gap:7px;margin-bottom:24px}
+.tag{background:#eef3e9;border:1px solid #e0e8d9;color:#536b54;border-radius:8px;padding:7px 10px;font-size:10px}
+.ask{border:1px solid #e2e8de;background:#fff;border-radius:17px;padding:12px;box-shadow:0 8px 28px #27422b0d}
+.prompt:before{display:none}
+.prompt input{padding:13px 8px;font-size:15px}
+.mic-button{width:40px;height:40px;border-radius:12px}
+.primary{border-radius:11px;padding:13px 17px;box-shadow:none}
+.primary:hover{transform:none}
+.try-area{margin-top:25px}
+.fruit-list{grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}
+.fruit-choice{border:1px solid #e7ebe4;border-radius:13px;padding:9px 3px;background:#fff;gap:6px}
+.fruit-choice:hover,.fruit-choice.active{background:#f0f5e9;border-color:#b9cda4;transform:none;box-shadow:none}
+.fruit-thumb{width:40px;height:40px;border-radius:12px;background:#f3f6ee;box-shadow:none}
+.right{background:#fff;color:var(--ink);border:1px solid #e3e9df;border-radius:20px;padding:18px;box-shadow:0 12px 38px #2339270f;min-height:600px}
+.right:before{display:none}
+.report-top{padding:3px 3px 15px;border-bottom:1px solid #edf0ea;margin-bottom:14px}
+.report-label{color:#45654c;font-size:9px;letter-spacing:1.7px}
+.source-pill{color:#6b786d;border:1px solid #e7ece4;background:#f8faf6;font-size:9px}
+.source-pill b{color:#557447}
+.report-empty{min-height:520px;border:1px dashed #dce5d8;border-radius:15px;background:linear-gradient(145deg,#f8faf5,#f2f6ed);color:#738074;padding:30px}
+.report-empty .symbol{width:76px;height:76px;border-radius:23px;background:#e3edda;color:#416244;box-shadow:none;transform:none}
+.report-empty h2{font:700 24px 'Playfair Display',serif;color:#2d4934}
+.report-empty p{color:#748174;font-size:12px}
+.report-fruit-hero{min-height:245px;border-radius:15px;padding:20px}
+.report-fruit-hero h2{font-size:34px}
+.result-stat{background:#f8faf6;border:1px solid #e8ede5;border-radius:13px;padding:13px}
+.result-stat b{color:#778478;font-size:8px}
+.result-stat span{font-size:21px;color:#294432}
+.result-stat small{color:#849087}
+.report-section,.condition-result,.report-source-note,.result-detail,.result-audio{background:#fff;color:#35483a;border:1px solid #e7ece4;border-radius:13px;padding:15px;box-shadow:none}
+.report-section-kicker{color:#6b8652;font-size:8px}
+.report-section p,.condition-result p,.report-source-note p,.result-detail p{color:#66736a;font-size:12px;line-height:1.7}
+.report-list{color:#66736a;font-size:12px}
+.report-fact b{color:#819083}.report-fact span{color:#344b39}
+.condition-result{border-left:3px solid #c5a65a;background:#fbfaf5;box-shadow:none}
+.condition-result:before{display:none}
+.condition-result .report-section-kicker{color:#9a7a35}
+.condition-result .condition-status{color:#765d2c;font-size:15px;text-transform:none;letter-spacing:0}
+.condition-result.verdict-positive{background:#f5f9f1;border-color:#cbdcbd;box-shadow:none}
+.condition-result.verdict-positive .condition-status{color:#41683d}
+.condition-result.verdict-caution{background:#fff6f2;border-color:#edc9bd;box-shadow:none}
+.condition-result.verdict-caution .condition-status{color:#a34f3f}
+.disclaimer{max-width:1160px;margin:20px auto 0;color:#929b91;font-size:9px}
+@media(max-width:760px){.shell{padding:18px 16px 26px}.workspace{grid-template-columns:1fr;gap:18px}.brand{margin-bottom:32px}.right{min-height:360px;padding:13px}.report-empty{min-height:300px}}
+@media(max-width:480px){.shell{padding:15px 12px 22px}.brand{margin-bottom:27px}.right{border-radius:16px}.fruit-choice{padding:8px 1px}.fruit-thumb{width:35px;height:35px}.fruit-name{font-size:10px}.report-fruit-hero{min-height:225px;padding:16px}}
+
+</style></head><body><div class="shell"><div class="workspace"><section class="left"><div class="brand"><span class="brand-icon">✿</span><span>FruitBuddie</span></div><h1>Your family's friendly guide to <span>healthy fruit choices.</span></h1><p class="intro">Ask about a fruit and get clear, evidence-aware guidance shaped around your health needs.</p><div class="tags"><span class="tag">Multiple health conditions</span><span class="tag">Evidence-led guidance</span><span class="tag">Practical portions</span></div><section class="ask"><form id="ask-form"><div class="prompt"><input id="question-input" type="text" placeholder="Ask about guava, mango, or any fruit..." autocomplete="off" required></div><div class="prompt-bottom"><div class="answer-language"><span>✧ Replies in your question’s language</span></div><div style="display:flex;align-items:center;gap:8px"><button class="mic-button" id="mic-button" type="button" aria-label="Speak your question">♩</button><button class="primary" id="ask-button" type="submit">Ask FruitBuddie ↗</button></div></div><p id="voice-status" class="voice-status"></p></form></section><div class="try-area"><div class="section-label">TRY A FRUIT</div><div class="fruit-list"><button class="fruit-choice active" data-fruit="Guava"><span class="fruit-thumb">🍈</span><span><span class="fruit-name">Guava</span><span class="fruit-sub">Amrood / Jama</span></span></button><button class="fruit-choice" data-fruit="Mango"><span class="fruit-thumb">🥭</span><span><span class="fruit-name">Mango</span><span class="fruit-sub">Aam / Amba</span></span></button><button class="fruit-choice" data-fruit="Jamun"><span class="fruit-thumb">🫐</span><span><span class="fruit-name">Jamun</span><span class="fruit-sub">Java plum / Kala jamun</span></span></button><button class="fruit-choice" data-fruit="Papaya"><span class="fruit-thumb">🍈</span><span><span class="fruit-name">Papaya</span><span class="fruit-sub">Papita / Pappali</span></span></button><button class="fruit-choice" data-fruit="Orange"><span class="fruit-thumb">🍊</span><span><span class="fruit-name">Orange</span><span class="fruit-sub">Santra / Kamala</span></span></button></div></div></section><section class="right"><div class="report-top"><span class="report-label">✧ CLINICAL HEALTH REPORT</span><span class="source-pill">Evidence-led · <b>Sources shown with answers</b></span></div><div id="report-empty" class="report-empty"><div class="symbol">✿</div><h2>Your fruit report starts here</h2><p>Ask about a fruit or choose one from the list. Your report will bring together nutrition facts, relevant health considerations and evidence.</p></div><div id="ask-result" class="answer" aria-live="polite"></div></section></div><p class="disclaimer">FruitBuddie provides general nutrition information, not a medical diagnosis or a replacement for advice from your doctor or dietitian.</p></div><script>
 (()=>{
 const form=document.getElementById("ask-form"),input=document.getElementById("question-input"),button=document.getElementById("ask-button"),micButton=document.getElementById("mic-button"),voiceStatus=document.getElementById("voice-status"),result=document.getElementById("ask-result"),suggestions=document.querySelectorAll(".suggestion");
 const selected=()=>Array.from(document.querySelectorAll('input[name="condition"]:checked')).map(x=>x.value);
@@ -94,18 +151,7 @@ async function ask(event){
 }
 form.addEventListener("submit",ask);
 // Submit naturally after the user finishes typing; keep the button and Enter as immediate alternatives.
-input.addEventListener("input",()=>{
- clearTimeout(typingTimer);
- const query=input.value.trim();
- if(query.length<2)return;
- typingTimer=setTimeout(()=>{
-  const current=input.value.trim();
-  if(current.length>=2&&current!==lastSubmitted&&!button.disabled){
-   lastSubmitted=current;
-   ask();
-  }
- },650);
-});
+input.addEventListener("input",()=>{ clearTimeout(typingTimer); });
 input.addEventListener("keydown",event=>{
  if(event.key==="Enter"&&!event.isComposing){
   event.preventDefault();clearTimeout(typingTimer);lastSubmitted=input.value.trim();ask();
