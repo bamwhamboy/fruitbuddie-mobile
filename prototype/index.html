@@ -149,7 +149,7 @@ else{
  };
  recognition.onend=()=>{
   micButton.classList.remove("listening");micButton.textContent="🎙";micButton.title="Ask by voice";
-  if(input.value.trim()){lastSubmitted=input.value.trim();voiceMessage("Hindi question captured. Submitting…");ask();}
+  if(finalTranscript.trim()){input.value=finalTranscript.trim();lastSubmitted=input.value;voiceMessage("Hindi question captured. Submitting…");ask();}else{voiceMessage("No clear speech was captured. Please try again.",true);}
  };
 }
 document.querySelectorAll(".fruit-choice").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".fruit-choice").forEach(x=>x.classList.remove("active"));b.classList.add("active");input.value="Can I eat "+b.dataset.fruit+"?";input.focus();}));
