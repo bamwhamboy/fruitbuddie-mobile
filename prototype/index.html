@@ -185,7 +185,7 @@ input.addEventListener("keydown",event=>{
  }
 });
 
-let mediaRecorder=null,recordedChunks=[],recordingStream=null,voiceBusy=false;
+let mediaRecorder=null,recordedChunks=[],recordingStream=null,voiceBusy=false,recordingLimit=null;
 function voiceMessage(message,isError=false){
  voiceStatus.textContent=message;
  voiceStatus.classList.toggle("error",isError);
@@ -231,6 +231,7 @@ micButton.addEventListener("click",async()=>{
   mediaRecorder.ondataavailable=event=>{if(event.data&&event.data.size)recordedChunks.push(event.data);};
   mediaRecorder.onerror=()=>{voiceMessage("Recording failed. Please try again.",true);};
   mediaRecorder.onstop=async()=>{
+   clearTimeout(recordingLimit);voiceBusy=true;
    const blob=new Blob(recordedChunks,{type:mediaRecorder.mimeType||"audio/webm"});
    recordingStream?.getTracks().forEach(track=>track.stop());recordingStream=null;
    setMicState(false);voiceMessage("Transcribing your question…");
@@ -239,7 +240,8 @@ micButton.addEventListener("click",async()=>{
    finally{voiceBusy=false;mediaRecorder=null;setMicState(false);}
   };
   voiceBusy=false;mediaRecorder.start();setMicState(true);
-  voiceMessage("Recording… tap the microphone again when you’re done.");
+  voiceMessage("Recording… tap the microphone again when you’re done. Max 25 seconds.");
+  recordingLimit=setTimeout(()=>{if(mediaRecorder?.state==="recording"){voiceMessage("25-second limit reached. Transcribing…");mediaRecorder.stop();}},25000);
  }catch(error){
   voiceBusy=false;recordingStream?.getTracks().forEach(track=>track.stop());recordingStream=null;setMicState(false);
   const message=error.name==="NotAllowedError"?"Microphone permission is blocked. Allow it in Chrome's site settings and try again.":error.name==="NotFoundError"?"No microphone was found. Connect or enable a microphone.":error.name==="NotReadableError"?"Your microphone is busy. Close other apps using it and try again.":(error.message||"Could not start microphone.");
