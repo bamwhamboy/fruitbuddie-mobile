@@ -115,12 +115,20 @@ function renderStructured(data){
  verdict.append(node("div","report-verdict-icon",tone==="positive"?"✓":"⚕"));
  const copy=node("div","report-verdict-copy");copy.append(node("span","report-verdict-label","CLINICAL ASSESSMENT"),node("strong","",String(safety).toUpperCase()),node("small","",d.portion||d.serving_size||"See the guidance below"));
  verdict.append(copy);result.append(verdict);
- const audioUrl=d.audio_url;
- if(typeof audioUrl==="string"&&/^(data:audio\/|https?:\/\/)/i.test(audioUrl)){
+ const audioUrl=d.audio_url||d.audio_base64||d.audio;
+ let playableAudioUrl="";
+ if(typeof audioUrl==="string"){
+  if(/^(data:audio\/|https?:\/\/)/i.test(audioUrl))playableAudioUrl=audioUrl;
+  else if(/^[A-Za-z0-9+/]+={0,2}$/.test(audioUrl.replace(/\s/g,""))&&audioUrl.length>100)playableAudioUrl="data:audio/wav;base64,"+audioUrl.replace(/\s/g,"");
+ }
+ if(playableAudioUrl){
   const panel=node("div","report-audio-panel"),play=node("button","report-audio-play","▶"),content=node("div","report-audio-content");
   content.append(node("b","","Listen to Clinical Advice"),node("small","","TAP TO REPLAY"));
-  const audio=node("audio");audio.controls=true;audio.preload="none";audio.src=audioUrl;content.append(audio);
-  play.addEventListener("click",()=>{audio.currentTime=0;audio.play().catch(()=>{});});panel.append(play,content);result.append(panel);
+  const audio=node("audio");audio.controls=true;audio.preload="metadata";audio.src=playableAudioUrl;
+  audio.addEventListener("error",()=>voiceMessage("Audio playback failed. Please try again.",true));
+  content.append(audio);
+  play.addEventListener("click",()=>{audio.currentTime=0;audio.play().catch(()=>voiceMessage("Could not play audio. Check your device sound settings.",true));});
+  panel.append(play,content);result.append(panel);
  }
  const stats=node("div","report-stat-grid");
  const gi=d.gi??d.glycemic_index,gl=d.gl??d.glycemic_load,k=d.potassium_mg;
