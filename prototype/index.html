@@ -77,6 +77,7 @@ function renderStructured(data){
  }
  return true;
 }
+let typingTimer=null,lastSubmitted="";
 async function ask(event){
  event?.preventDefault();const query=input.value.trim();if(!query){displayMessage("Please enter a question first.",true);return;}
  button.disabled=true;button.textContent="Thinking…";displayMessage("Considering your health profile…");
@@ -93,18 +94,17 @@ async function ask(event){
 }
 form.addEventListener("submit",ask);
 // Submit naturally after the user finishes typing; keep the button and Enter as immediate alternatives.
-let typingTimer=null,lastSubmitted="";
 input.addEventListener("input",()=>{
  clearTimeout(typingTimer);
  const query=input.value.trim();
- if(query.length<5)return;
+ if(query.length<2)return;
  typingTimer=setTimeout(()=>{
   const current=input.value.trim();
-  if(current.length>=5&&current!==lastSubmitted&&!button.disabled){
+  if(current.length>=2&&current!==lastSubmitted&&!button.disabled){
    lastSubmitted=current;
    ask();
   }
- },1400);
+ },650);
 });
 input.addEventListener("keydown",event=>{
  if(event.key==="Enter"&&!event.isComposing){
@@ -123,7 +123,7 @@ else{
   if(micButton.classList.contains("listening")){recognition.stop();return;}
   finalTranscript="";input.value="";
   voiceMessage("Starting microphone…");
-  try{recognition.lang="en-IN";recognition.start();}
+  try{recognition.lang="hi-IN";recognition.start();}
   catch(error){voiceMessage("Could not start microphone ("+error.name+"). Reload the page and try again.",true);}
  });
  recognition.onstart=()=>{micButton.classList.add("listening");micButton.textContent="■";micButton.title="Stop listening";voiceMessage("Listening… speak now.");};
@@ -149,7 +149,7 @@ else{
  };
  recognition.onend=()=>{
   micButton.classList.remove("listening");micButton.textContent="🎙";micButton.title="Ask by voice";
-  if(input.value.trim())voiceMessage("Voice captured. Review your question, then tap Ask FruitBuddie.");
+  if(input.value.trim()){lastSubmitted=input.value.trim();voiceMessage("Hindi question captured. Submitting…");ask();}
  };
 }
 document.querySelectorAll(".fruit-choice").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".fruit-choice").forEach(x=>x.classList.remove("active"));b.classList.add("active");input.value="Can I eat "+b.dataset.fruit+"?";input.focus();}));
