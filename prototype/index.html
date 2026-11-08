@@ -79,6 +79,8 @@ h1 span{color:#78915c}
 @media(max-width:760px){.shell{padding:18px 16px 26px}.workspace{grid-template-columns:1fr;gap:18px}.brand{margin-bottom:32px}.right{min-height:360px;padding:13px}.report-empty{min-height:300px}}
 @media(max-width:480px){.shell{padding:15px 12px 22px}.brand{margin-bottom:27px}.right{border-radius:16px}.fruit-choice{padding:8px 1px}.fruit-thumb{width:35px;height:35px}.fruit-name{font-size:10px}.report-fruit-hero{min-height:225px;padding:16px}}
 
+
+.report-fruit-hero.no-fruit-image{background-image:radial-gradient(ellipse at 75% 25%,#d8e8b633,transparent 45%),linear-gradient(135deg,#315e43,#183c2c)}.report-fruit-hero.no-fruit-image:before{content:"";position:absolute;width:180px;height:180px;right:7%;top:12%;border-radius:50%;border:1px solid #ffffff30;box-shadow:0 0 0 18px #ffffff0b,0 0 0 38px #ffffff08}.season-card{background:#f5f8f0;border-color:#dfe9d7}.season-card .report-section-kicker{color:#66834f}.season-months{font-size:18px!important;font-weight:700;color:#31563a!important;line-height:1.45!important}.season-regions{font-size:11px!important;color:#7a887a!important;margin-top:8px!important}
 </style></head><body><div class="shell"><div class="workspace"><section class="left"><div class="brand"><span class="brand-icon">✿</span><span>FruitBuddie</span></div><h1>Your family's friendly guide to <span>healthy fruit choices.</span></h1><p class="intro">Ask about a fruit and get clear, evidence-aware guidance shaped around your health needs.</p><div class="tags"><span class="tag">Multiple health conditions</span><span class="tag">Evidence-led guidance</span><span class="tag">Practical portions</span></div><section class="ask"><form id="ask-form"><div class="prompt"><input id="question-input" type="text" placeholder="Ask about guava, mango, or any fruit..." autocomplete="off" required></div><div class="prompt-bottom"><div class="answer-language"><span>✧ Replies in your question’s language</span></div><div style="display:flex;align-items:center;gap:8px"><button class="mic-button" id="mic-button" type="button" aria-label="Speak your question">♩</button><button class="primary" id="ask-button" type="submit">Ask FruitBuddie ↗</button></div></div><p id="voice-status" class="voice-status"></p></form></section><div class="try-area"><div class="section-label">TRY A FRUIT</div><div class="fruit-list"><button class="fruit-choice active" data-fruit="Guava"><span class="fruit-thumb">🍈</span><span><span class="fruit-name">Guava</span><span class="fruit-sub">Amrood / Jama</span></span></button><button class="fruit-choice" data-fruit="Mango"><span class="fruit-thumb">🥭</span><span><span class="fruit-name">Mango</span><span class="fruit-sub">Aam / Amba</span></span></button><button class="fruit-choice" data-fruit="Jamun"><span class="fruit-thumb">🫐</span><span><span class="fruit-name">Jamun</span><span class="fruit-sub">Java plum / Kala jamun</span></span></button><button class="fruit-choice" data-fruit="Papaya"><span class="fruit-thumb">🍈</span><span><span class="fruit-name">Papaya</span><span class="fruit-sub">Papita / Pappali</span></span></button><button class="fruit-choice" data-fruit="Orange"><span class="fruit-thumb">🍊</span><span><span class="fruit-name">Orange</span><span class="fruit-sub">Santra / Kamala</span></span></button></div></div></section><section class="right"><div class="report-top"><span class="report-label">✧ CLINICAL HEALTH REPORT</span><span class="source-pill">Evidence-led · <b>Sources shown with answers</b></span></div><div id="report-empty" class="report-empty"><div class="symbol">✿</div><h2>Your fruit report starts here</h2><p>Ask about a fruit or choose one from the list. Your report will bring together nutrition facts, relevant health considerations and evidence.</p></div><div id="ask-result" class="answer" aria-live="polite"></div></section></div><p class="disclaimer">FruitBuddie provides general nutrition information, not a medical diagnosis or a replacement for advice from your doctor or dietitian.</p></div><script>
 (()=>{
 const form=document.getElementById("ask-form"),input=document.getElementById("question-input"),button=document.getElementById("ask-button"),micButton=document.getElementById("mic-button"),voiceStatus=document.getElementById("voice-status"),result=document.getElementById("ask-result"),suggestions=document.querySelectorAll(".suggestion");
@@ -104,7 +106,8 @@ function renderStructured(data){
  clearResult();
  const safety=d.recommendation||d.overall_assessment||d.diabetic_safety||"Individual assessment needed";
  const hero=node("div","report-fruit-hero");
- if(typeof d.image_url==="string"&&/^https?:\/\//i.test(d.image_url)){const img=node("img");img.src=d.image_url;img.alt=d.fruit||"Fruit";img.onerror=()=>img.remove();hero.append(img);}
+ const fruitImage=d.image_url||d.fruit_image_url||d.image;
+ if(typeof fruitImage==="string"&&/^https?:\\/\\//i.test(fruitImage)){const img=node("img");img.src=fruitImage;img.alt=(d.fruit||"Fruit")+" photograph";img.loading="lazy";img.onerror=()=>{img.remove();hero.classList.add("no-fruit-image");};hero.append(img);}else{hero.classList.add("no-fruit-image");}
  const shade=node("div","report-fruit-shade");
  const top=node("div","report-fruit-top");top.append(node("span","report-eyebrow","YOUR FRUIT PROFILE"),node("span","report-live","● PERSONAL NUTRITION GUIDE"));
  const name=node("h2","",d.fruit||"Your fruit guide");
@@ -116,7 +119,7 @@ function renderStructured(data){
  addStat(stats,"GLYCEMIC INDEX",d.gi??d.glycemic_index,"Only when supplied by the clinical record");
  addStat(stats,"GLYCEMIC LOAD",d.gl??d.glycemic_load,"Serving-dependent; not inferred");
  addStat(stats,"POTASSIUM",d.potassium_mg!=null?d.potassium_mg+" mg":null,"Per stated serving, if verified");
- addStat(stats,"BEST TIME",d.best_time||d.season,null);
+ addStat(stats,"BEST TIME TO EAT",d.best_time,null);
  if(stats.childElementCount)result.append(stats);
  if(d.condition_assessments){
   const assessments=Array.isArray(d.condition_assessments)?d.condition_assessments:Object.entries(d.condition_assessments).map(([condition,value])=>({condition,...(typeof value==="object"?value:{assessment:value})}));
@@ -128,7 +131,20 @@ function renderStructured(data){
  section("ADDITIONAL HEALTH NOTES",d.health_benefits||d.benefits||d.renal_safety||d.kidney_caution||null);
  section("EVIDENCE & SOURCES",d.sources||d.evidence_sources||d.references||null);
  if(!d.sources&&!d.evidence_sources&&!d.references){const note=node("section","report-source-note");note.append(node("div","report-section-kicker","EVIDENCE TRANSPARENCY"),node("p","","Source citations were not included in this response. FruitBuddie will not invent references or imply that an unverified value is clinically established."));result.append(note);}
- if(d.season&&d.season!=="N/A")section("SEASONAL AVAILABILITY",d.season);
+ const indiaSeason=d.season_in_india||d.indian_season||d.seasonal_availability||d.season||null;
+ if(indiaSeason&&indiaSeason!=="N/A"){
+  const seasonCard=node("section","report-section season-card");
+  seasonCard.append(node("div","report-section-kicker","IN SEASON IN INDIA"));
+  if(typeof indiaSeason==="object"){
+   const months=indiaSeason.months||indiaSeason.typical_months||indiaSeason.availability_months;
+   const detail=indiaSeason.note||indiaSeason.regional_note||indiaSeason.explanation||indiaSeason.availability;
+   if(months)seasonCard.append(node("p","season-months",Array.isArray(months)?months.join(" · "):months));
+   if(detail)seasonCard.append(node("p","",detail));
+   if(indiaSeason.regions)seasonCard.append(node("p","season-regions","Regional variation: "+(Array.isArray(indiaSeason.regions)?indiaSeason.regions.join(", "):indiaSeason.regions)));
+  }else seasonCard.append(node("p","season-months",indiaSeason));
+  if(!seasonCard.querySelector("p"))seasonCard.append(node("p","","Availability varies by region, variety and growing conditions."));
+  result.append(seasonCard);
+ }
  if(typeof d.audio_url==="string"&&/^(data:audio\/|https?:\/\/)/i.test(d.audio_url)){
   const wrap=node("div","result-audio"),audio=node("audio");audio.controls=true;audio.preload="none";audio.src=d.audio_url;wrap.append(node("div","report-section-kicker","LISTEN TO YOUR ANSWER"),audio);result.append(wrap);
  }
