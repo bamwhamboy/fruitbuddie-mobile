@@ -175,45 +175,91 @@ input.addEventListener("keydown",event=>{
 });
 
 const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
-function voiceMessage(message,isError=false){voiceStatus.textContent=message;voiceStatus.classList.toggle("error",isError);}
-if(!window.isSecureContext){micButton.disabled=true;voiceMessage("Voice input requires a secure HTTPS connection.",true);}
-else if(!SpeechRecognition){micButton.disabled=true;voiceMessage("Voice typing is not supported by this browser. Try the latest Chrome desktop browser.",true);}
-else{
- const recognition=new SpeechRecognition();recognition.interimResults=true;recognition.continuous=false;
- let finalTranscript="";
- micButton.addEventListener("click",()=>{
-  if(micButton.classList.contains("listening")){recognition.stop();return;}
-  finalTranscript="";input.value="";
-  voiceMessage("Starting microphone…");
-  try{recognition.lang=(navigator.language&&navigator.language.toLowerCase().startsWith("hi"))?"hi-IN":"en-IN";recognition.start();}
-  catch(error){voiceMessage("Could not start microphone ("+error.name+"). Reload the page and try again.",true);}
- });
- recognition.onstart=()=>{micButton.classList.add("listening");micButton.textContent="■";micButton.title="Stop listening";voiceMessage("Listening… speak now.");};
+function voiceMessage(message,isError=false){
+ voiceStatus.textContent=message;
+ voiceStatus.classList.toggle("error",isError);
+ voiceStatus.style.color=isError?"#b84e39":"#718078";
+}
+let recognition=null,finalTranscript="",startingVoice=false;
+if(!window.isSecureContext){
+ voiceMessage("Voice input needs a secure HTTPS connection. You can still type your question.",true);
+}else if(!SpeechRecognition){
+ voiceMessage("This browser does not support voice typing. Please use the latest Google Chrome or type your question.",true);
+}else{
+ recognition=new SpeechRecognition();
+ recognition.interimResults=true;
+ recognition.continuous=false;
+ recognition.maxAlternatives=1;
+ recognition.onstart=()=>{
+  startingVoice=false;
+  micButton.classList.add("listening");
+  micButton.textContent="■";
+  micButton.title="Stop listening";
+  micButton.setAttribute("aria-label","Stop listening");
+  voiceMessage("Listening… speak now.");
+ };
  recognition.onresult=(event)=>{
   let interim="";
   for(let i=event.resultIndex;i<event.results.length;i++){
    const transcript=event.results[i][0].transcript;
-   if(event.results[i].isFinal)finalTranscript+=transcript;else interim+=transcript;
+   if(event.results[i].isFinal)finalTranscript+=transcript;
+   else interim+=transcript;
   }
   input.value=(finalTranscript+" "+interim).trim();
   if(input.value)voiceMessage("Heard: "+input.value);
  };
  recognition.onnomatch=()=>voiceMessage("I couldn't make that out. Please try again.",true);
  recognition.onerror=(event)=>{
+  startingVoice=false;
   const messages={
-   "not-allowed":"Microphone permission is blocked. Click the lock icon beside the address bar, allow Microphone, then reload.",
-   "service-not-allowed":"Browser speech service is blocked. Check browser permissions or try Chrome.",
-   "audio-capture":"No microphone was detected. Check your microphone connection and system input settings.",
-   "network":"Speech recognition service could not connect. Check your internet connection.",
+   "not-allowed":"Microphone access is blocked. In Chrome, click the site icon beside the address, set Microphone to Allow, then reload.",
+   "service-not-allowed":"Chrome's speech service is blocked. Check site permissions or try another network.",
+   "audio-capture":"No microphone was detected. Check your Mac's input device and Chrome microphone permission.",
+   "network":"Chrome's speech recognition service could not connect. Check your internet connection.",
    "no-speech":"No speech detected. Tap the mic and speak after it says Listening."
   };
   voiceMessage(messages[event.error]||("Voice input error: "+event.error+". You can still type."),true);
  };
  recognition.onend=()=>{
-  micButton.classList.remove("listening");micButton.textContent="🎙";micButton.title="Ask by voice";
-  if(finalTranscript.trim()){input.value=finalTranscript.trim();lastSubmitted=input.value;voiceMessage("Hindi question captured. Submitting…");ask();}else{voiceMessage("No clear speech was captured. Please try again.",true);}
+  startingVoice=false;
+  micButton.classList.remove("listening");
+  micButton.textContent="🎙";
+  micButton.title="Ask by voice";
+  micButton.setAttribute("aria-label","Ask by voice");
+  if(finalTranscript.trim()){
+   input.value=finalTranscript.trim();
+   lastSubmitted=input.value;
+   voiceMessage("Question captured. Sending to FruitBuddie…");
+   ask();
+  }else if(!voiceStatus.classList.contains("error")){
+   voiceMessage("No speech was captured. Tap the mic and try again.",true);
+  }
  };
 }
+micButton.addEventListener("click",async()=>{
+ if(!window.isSecureContext){voiceMessage("Voice input needs HTTPS. Please type your question.",true);return;}
+ if(!recognition){voiceMessage("Voice typing is unavailable in this browser. Try the latest Google Chrome.",true);return;}
+ if(micButton.classList.contains("listening")){
+  recognition.stop();
+  return;
+ }
+ if(startingVoice)return;
+ finalTranscript="";
+ input.value="";
+ voiceMessage("Requesting microphone access…");
+ try{
+  if(!navigator.mediaDevices?.getUserMedia)throw new Error("Microphone access is unavailable. Check browser permissions.");
+  const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+  stream.getTracks().forEach(track=>track.stop());
+  startingVoice=true;
+  recognition.lang=(navigator.language&&navigator.language.toLowerCase().startsWith("hi"))?"hi-IN":"en-IN";
+  recognition.start();
+ }catch(error){
+  startingVoice=false;
+  const message=error.name==="NotAllowedError"?"Microphone permission was denied. Click the site icon beside the address bar, allow Microphone, and try again.":error.name==="NotFoundError"?"No microphone was found. Connect or enable a microphone and try again.":error.name==="NotReadableError"?"Your microphone is busy or unavailable. Close other apps using it and try again.":("Could not start microphone: "+(error.message||error.name)+". You can still type.");
+  voiceMessage(message,true);
+ }
+});
 document.querySelectorAll(".fruit-choice").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".fruit-choice").forEach(x=>x.classList.remove("active"));b.classList.add("active");input.value="Can I eat "+b.dataset.fruit+"?";input.focus();}));
 })();
 </script></body></html>
