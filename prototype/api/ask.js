@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Backend is not configured yet." });
   }
 
-  const { query, language = "en-IN", health_conditions = [], goal = "General fruit guidance" } = req.body || {};
+  const { query, language = "auto", detect_language = true, health_conditions = [], goal = "General fruit guidance" } = req.body || {};
   if (typeof query !== "string" || !query.trim()) {
     return res.status(400).json({ error: "Please enter a question." });
   }
@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     const upstream = await fetch(webhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Accept": "application/json" },
-      body: JSON.stringify({ query: query.trim(), language, health_conditions: Array.isArray(health_conditions) ? health_conditions : [], goal }),
+      body: JSON.stringify({ query: query.trim(), language, detect_language: detect_language === true, health_conditions: Array.isArray(health_conditions) ? health_conditions : [], goal }),
       signal: controller.signal
     });
     const body = await upstream.text();
