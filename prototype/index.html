@@ -123,7 +123,7 @@ else{
   if(micButton.classList.contains("listening")){recognition.stop();return;}
   finalTranscript="";input.value="";
   voiceMessage("Starting microphone…");
-  try{recognition.lang="hi-IN";recognition.start();}
+  try{recognition.lang=(navigator.language&&navigator.language.toLowerCase().startsWith("hi"))?"hi-IN":"en-IN";recognition.start();}
   catch(error){voiceMessage("Could not start microphone ("+error.name+"). Reload the page and try again.",true);}
  });
  recognition.onstart=()=>{micButton.classList.add("listening");micButton.textContent="■";micButton.title="Stop listening";voiceMessage("Listening… speak now.");};
