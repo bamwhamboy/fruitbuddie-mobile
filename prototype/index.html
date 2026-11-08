@@ -30,7 +30,54 @@ h1{max-width:560px;margin:0 0 18px;font:700 clamp(32px,3.2vw,43px)/1.13 Manrope;
 .disclaimer{max-width:1320px;margin:18px auto 0;color:#777e99;font-size:10px;line-height:1.6;text-align:center}
 @media(max-width:1050px){.shell{padding:28px 22px}.workspace{grid-template-columns:minmax(320px,.9fr) minmax(390px,1.1fr);gap:20px}.brand{margin-bottom:34px}}
 @media(max-width:760px){.shell{padding:22px 16px}.workspace{grid-template-columns:1fr;gap:20px}.left{padding:0}.brand{margin-bottom:28px}.right{min-height:420px}.report-empty{min-height:350px}h1{font-size:35px}}
-@media(max-width:480px){.shell{padding:17px 12px}.intro{font-size:14px}.tag{padding:7px 9px;font-size:10px}.prompt-bottom{align-items:flex-start;flex-wrap:wrap}.answer-language{flex:1}.primary{padding:12px 13px;font-size:11px}.mic-button{flex-basis:40px;width:40px;height:40px}.fruit-list{grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}.fruit-choice{padding:9px 2px;border-radius:13px}.fruit-thumb{width:38px;height:38px;border-radius:13px;font-size:21px}.fruit-name{font-size:10px}.fruit-sub{display:none}.right{padding:11px;border-radius:20px}.report-top{align-items:flex-start;flex-direction:column}.report-fruit-hero{min-height:245px;padding:16px}.report-fruit-hero h2{font-size:32px}.report-live{font-size:7px}.report-portion{margin:8px 0 0}.result-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.report-facts{grid-template-columns:1fr}.report-empty{padding:24px}.report-empty h2{font-size:21px}}</style></head><body><div class="shell"><div class="workspace"><section class="left"><div class="brand"><span class="brand-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 10.2c-3.7-3.2-10.2-.5-10.2 6.1 0 6.4 4.5 11.2 8.6 11.2 1 0 1.3-.5 1.6-.5s.7.5 1.7.5c4.1 0 8.6-4.8 8.6-11.2 0-6.6-6.5-9.3-10.3-6.1Z" fill="currentColor"/><path d="M16 9.6c-.2-3.7 2.1-6.1 5.8-6.9-.2 3.7-2.1 6.2-5.8 6.9Z" fill="#8bd7ae"/><path d="M15.8 10.1c-1.1-2.1-2.8-3.1-5-3.3" fill="none" stroke="#8bd7ae" stroke-width="1.7" stroke-linecap="round"/></svg></span><span>FruitBuddie</span></div><h1>Your family's friendly guide to <span>healthy fruit choices.</span></h1><p class="intro">Ask about a fruit and get clear, evidence-aware guidance shaped around your health needs.</p><div class="tags"><span class="tag">Multiple health conditions</span><span class="tag">Evidence-led guidance</span><span class="tag">Practical portions</span></div><section class="ask"><form id="ask-form"><div class="prompt"><input id="question-input" type="text" placeholder="Ask about guava, mango, or any fruit..." autocomplete="off" required></div><div class="prompt-bottom"><div class="answer-language"><span>✧ Replies in your question’s language</span></div><div style="display:flex;align-items:center;gap:8px"><button class="mic-button" id="mic-button" type="button" aria-label="Start voice input" title="Speak your question"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="9" y="2.5" width="6" height="12" rx="3"></rect><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3.5M8.5 21.5h7"></path></svg></button><button class="primary" id="ask-button" type="submit">Ask FruitBuddie ↗</button></div></div><p id="voice-status" class="voice-status"></p></form></section><div class="try-area"><div class="section-label">TRY A FRUIT</div><div class="fruit-list"><button class="fruit-choice active" data-fruit="Guava"><span class="fruit-thumb">🍈</span><span><span class="fruit-name">Guava</span><span class="fruit-sub">Amrood / Jama</span></span></button><button class="fruit-choice" data-fruit="Mango"><span class="fruit-thumb">🥭</span><span><span class="fruit-name">Mango</span><span class="fruit-sub">Aam / Amba</span></span></button><button class="fruit-choice" data-fruit="Jamun"><span class="fruit-thumb">🫐</span><span><span class="fruit-name">Jamun</span><span class="fruit-sub">Java plum / Kala jamun</span></span></button><button class="fruit-choice" data-fruit="Papaya"><span class="fruit-thumb">🍈</span><span><span class="fruit-name">Papaya</span><span class="fruit-sub">Papita / Pappali</span></span></button><button class="fruit-choice" data-fruit="Orange"><span class="fruit-thumb">🍊</span><span><span class="fruit-name">Orange</span><span class="fruit-sub">Santra / Kamala</span></span></button></div></div></section><section class="right"><div class="report-top"><span class="report-label">✧ CLINICAL HEALTH REPORT</span><span class="source-pill">Evidence-led · <b>Sources shown with answers</b></span></div><div id="report-empty" class="report-empty"><div class="symbol">✿</div><h2>Your fruit report starts here</h2><p>Ask about a fruit or choose one from the list. Your report will bring together nutrition facts, relevant health considerations and evidence.</p></div><div id="ask-result" class="answer" aria-live="polite"></div></section></div><p class="disclaimer">FruitBuddie provides general nutrition information, not a medical diagnosis or a replacement for advice from your doctor or dietitian.</p></div><script>
+@media(max-width:480px){.shell{padding:17px 12px}.intro{font-size:14px}.tag{padding:7px 9px;font-size:10px}.prompt-bottom{align-items:flex-start;flex-wrap:wrap}.answer-language{flex:1}.primary{padding:12px 13px;font-size:11px}.mic-button{flex-basis:40px;width:40px;height:40px}.fruit-list{grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}.fruit-choice{padding:9px 2px;border-radius:13px}.fruit-thumb{width:38px;height:38px;border-radius:13px;font-size:21px}.fruit-name{font-size:10px}.fruit-sub{display:none}.right{padding:11px;border-radius:20px}.report-top{align-items:flex-start;flex-direction:column}.report-fruit-hero{min-height:245px;padding:16px}.report-fruit-hero h2{font-size:32px}.report-live{font-size:7px}.report-portion{margin:8px 0 0}.result-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.report-facts{grid-template-columns:1fr}.report-empty{padding:24px}.report-empty h2{font-size:21px}}
+/* Clinical report layout */
+.report-top{padding:8px 8px 18px}
+.answer.show.structured{display:grid;gap:18px}
+.report-fruit-hero{min-height:360px;border-radius:28px;background:linear-gradient(90deg,#090d1c 0%,#10132688 52%,#10132622 100%),linear-gradient(0deg,#090d1c 0%,transparent 62%),url('/fruitbuddie-fruit-hero.jpg') center/cover,#171c2e;display:flex;align-items:end;padding:30px}
+.report-fruit-hero>img{opacity:.72}
+.report-fruit-shade{width:100%}
+.report-fruit-hero h2{font-size:clamp(38px,5vw,64px);margin:0 0 16px}
+.report-fruit-top{margin-bottom:18px}
+.report-season{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border:1px solid #806321;border-radius:30px;background:#4b391d99;color:#ffd45a;font-weight:700;font-size:13px}
+.report-verdict{display:flex;align-items:center;gap:18px;padding:28px;border-radius:30px;background:linear-gradient(110deg,#562b39,#2d1c2c);border:1px solid #8b3e48;box-shadow:0 0 35px #d94d4930}
+.report-verdict-icon{width:76px;height:76px;flex:0 0 76px;display:grid;place-items:center;border-radius:26px;background:#241321;color:#ff6b50;font-size:34px}
+.report-verdict-copy{display:grid;gap:8px}
+.report-verdict-label{color:#b5a7b7;font-size:12px;font-weight:800;letter-spacing:3px}
+.report-verdict strong{font-size:clamp(20px,3vw,32px);letter-spacing:1px;color:#ff7156}
+.report-verdict small{font-size:16px;color:#e2d7df}
+.report-verdict.positive{background:linear-gradient(110deg,#173c35,#1b2931);border-color:#397b63;box-shadow:0 0 30px #35c78b20}
+.report-verdict.positive .report-verdict-icon{color:#79e0ad}.report-verdict.positive strong{color:#83e2b1}
+.report-verdict.moderate{background:linear-gradient(110deg,#44391f,#292638);border-color:#8b713b}
+.report-verdict.moderate strong{color:#f2cf71}
+.report-audio-panel{display:flex;align-items:center;gap:18px;padding:20px;border:1px solid #383752;border-radius:26px;background:#19192e}
+.report-audio-play{width:76px;height:76px;flex:0 0 76px;border:7px solid #39315f;border-radius:50%;background:#f1d887;color:#141329;font-size:27px;cursor:pointer}
+.report-audio-content{min-width:0;flex:1}.report-audio-content b{font-size:20px}.report-audio-content small{display:block;margin-top:6px;color:#a6a6bc;letter-spacing:2px;font-weight:700}
+.report-audio-content audio{display:block;width:100%;height:34px;margin-top:10px}
+.report-stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.report-stat-card{padding:22px;border:1px solid #34344c;border-radius:24px;background:linear-gradient(145deg,#252339,#1b1a2d);min-width:0}
+.report-stat-head{display:flex;justify-content:space-between;gap:8px;align-items:center;color:#d7d5e4;font-size:12px;font-weight:800;letter-spacing:2px}
+.report-stat-tag{padding:6px 12px;border:1px solid #55506f;border-radius:30px;color:#aaa5c7;font-size:10px}
+.report-stat-tag.high{color:#ff7056;border-color:#8d493f}.report-stat-tag.low{color:#5cdda1;border-color:#397b63}
+.report-stat-sub{margin-top:8px;color:#aaa9bd;font-size:13px}.report-stat-value{margin-top:18px;font-size:42px;font-weight:800}
+.report-stat-bar{height:9px;margin-top:15px;border-radius:9px;background:linear-gradient(90deg,#49b98b 0 25%,#d2b15d 25% 60%,#c55b4a 60%);opacity:.75}
+.report-panel{padding:24px;border:1px solid #34344c;border-radius:25px;background:#1b1b31}
+.report-panel-title{display:flex;align-items:center;gap:10px;margin-bottom:18px;color:#d8caff;font-size:13px;font-weight:800;letter-spacing:2px}
+.report-condition-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:17px 0;border-bottom:1px solid #38364d}
+.report-condition-row:last-child{border-bottom:0;padding-bottom:0}
+.report-condition-name{font-size:17px;font-weight:700}.report-condition-status{padding:8px 14px;border:1px solid #4b4963;border-radius:30px;color:#b5b3c9;font-size:10px;font-weight:800;letter-spacing:1px}
+.report-condition-status.known{color:#e8cf7c;border-color:#75643a}
+.report-best-time{display:flex;gap:16px;align-items:center;padding:24px;border:1px solid #34344c;border-radius:24px;background:#1d1d34}
+.report-best-time b{display:block;margin-bottom:7px;color:#aaa9bd;font-size:12px;letter-spacing:2px}
+.report-transcript,.report-pairing{padding:25px;border:1px solid #34344c;border-radius:25px;background:#1d1d34}
+.report-transcript p,.report-pairing p{margin:0;color:#d6d5e2;font-size:17px;line-height:1.8}
+.report-sources{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.report-source-card{padding:17px;border:1px solid #39384f;border-radius:22px;background:#25253a;min-width:0}
+.report-source-card b{display:block;margin:0 0 6px;font-size:14px}.report-source-card span{color:#aaa9bf;font-size:12px;line-height:1.5}
+.report-disclaimer{margin-top:18px;color:#a6a5bb;font-size:12px;line-height:1.6}
+@media(max-width:680px){.report-fruit-hero{min-height:260px;padding:20px}.report-verdict{padding:18px;gap:12px}.report-verdict-icon{width:56px;height:56px;flex-basis:56px}.report-stat-grid,.report-sources{grid-template-columns:1fr}.report-audio-panel{gap:12px;padding:14px}.report-audio-play{width:58px;height:58px;flex-basis:58px}.report-condition-name{font-size:14px}}
+
+</style></head><body><div class="shell"><div class="workspace"><section class="left"><div class="brand"><span class="brand-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 10.2c-3.7-3.2-10.2-.5-10.2 6.1 0 6.4 4.5 11.2 8.6 11.2 1 0 1.3-.5 1.6-.5s.7.5 1.7.5c4.1 0 8.6-4.8 8.6-11.2 0-6.6-6.5-9.3-10.3-6.1Z" fill="currentColor"/><path d="M16 9.6c-.2-3.7 2.1-6.1 5.8-6.9-.2 3.7-2.1 6.2-5.8 6.9Z" fill="#8bd7ae"/><path d="M15.8 10.1c-1.1-2.1-2.8-3.1-5-3.3" fill="none" stroke="#8bd7ae" stroke-width="1.7" stroke-linecap="round"/></svg></span><span>FruitBuddie</span></div><h1>Your family's friendly guide to <span>healthy fruit choices.</span></h1><p class="intro">Ask about a fruit and get clear, evidence-aware guidance shaped around your health needs.</p><div class="tags"><span class="tag">Multiple health conditions</span><span class="tag">Evidence-led guidance</span><span class="tag">Practical portions</span></div><section class="ask"><form id="ask-form"><div class="prompt"><input id="question-input" type="text" placeholder="Ask about guava, mango, or any fruit..." autocomplete="off" required></div><div class="prompt-bottom"><div class="answer-language"><span>✧ Replies in your question’s language</span></div><div style="display:flex;align-items:center;gap:8px"><button class="mic-button" id="mic-button" type="button" aria-label="Start voice input" title="Speak your question"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="9" y="2.5" width="6" height="12" rx="3"></rect><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3.5M8.5 21.5h7"></path></svg></button><button class="primary" id="ask-button" type="submit">Ask FruitBuddie ↗</button></div></div><p id="voice-status" class="voice-status"></p></form></section><div class="try-area"><div class="section-label">TRY A FRUIT</div><div class="fruit-list"><button class="fruit-choice active" data-fruit="Guava"><span class="fruit-thumb">🍈</span><span><span class="fruit-name">Guava</span><span class="fruit-sub">Amrood / Jama</span></span></button><button class="fruit-choice" data-fruit="Mango"><span class="fruit-thumb">🥭</span><span><span class="fruit-name">Mango</span><span class="fruit-sub">Aam / Amba</span></span></button><button class="fruit-choice" data-fruit="Jamun"><span class="fruit-thumb">🫐</span><span><span class="fruit-name">Jamun</span><span class="fruit-sub">Java plum / Kala jamun</span></span></button><button class="fruit-choice" data-fruit="Papaya"><span class="fruit-thumb">🍈</span><span><span class="fruit-name">Papaya</span><span class="fruit-sub">Papita / Pappali</span></span></button><button class="fruit-choice" data-fruit="Orange"><span class="fruit-thumb">🍊</span><span><span class="fruit-name">Orange</span><span class="fruit-sub">Santra / Kamala</span></span></button></div></div></section><section class="right"><div class="report-top"><span class="report-label">✧ CLINICAL HEALTH REPORT</span><span class="source-pill">Evidence-led · <b>Sources shown with answers</b></span></div><div id="report-empty" class="report-empty"><div class="symbol">✿</div><h2>Your fruit report starts here</h2><p>Ask about a fruit or choose one from the list. Your report will bring together nutrition facts, relevant health considerations and evidence.</p></div><div id="ask-result" class="answer" aria-live="polite"></div></section></div><p class="disclaimer">FruitBuddie provides general nutrition information, not a medical diagnosis or a replacement for advice from your doctor or dietitian.</p></div><script>
 (()=>{
 const form=document.getElementById("ask-form"),input=document.getElementById("question-input"),button=document.getElementById("ask-button"),micButton=document.getElementById("mic-button"),voiceStatus=document.getElementById("voice-status"),result=document.getElementById("ask-result"),suggestions=document.querySelectorAll(".suggestion");
 const selected=()=>Array.from(document.querySelectorAll('input[name="condition"]:checked')).map(x=>x.value);
@@ -54,48 +101,52 @@ function renderStructured(data){
  if(!d||typeof d!=="object"||Array.isArray(d)||(!d.fruit&&!d.spoken_response&&!d.diabetic_safety&&!d.condition_assessments))return false;
  clearResult();
  const safety=d.recommendation||d.overall_assessment||d.diabetic_safety||"Individual assessment needed";
+ const tone=verdictTone(safety);
  const hero=node("div","report-fruit-hero");
  const fruitImage=d.image_url||d.fruit_image_url||d.image;
- if(typeof fruitImage==="string"&&/^https?:\\/\\//i.test(fruitImage)){const img=node("img");img.src=fruitImage;img.alt=(d.fruit||"Fruit")+" photograph";img.loading="lazy";img.onerror=()=>{img.remove();hero.classList.add("no-fruit-image");};hero.append(img);}else{hero.classList.add("no-fruit-image");}
+ if(typeof fruitImage==="string"&&/^https?:\/\//i.test(fruitImage)){const img=node("img");img.src=fruitImage;img.alt=(d.fruit||"Fruit")+" photograph";img.loading="lazy";img.onerror=()=>img.remove();hero.append(img);}
  const shade=node("div","report-fruit-shade");
- const top=node("div","report-fruit-top");top.append(node("span","report-eyebrow","YOUR FRUIT PROFILE"),node("span","report-live","● PERSONAL NUTRITION GUIDE"));
- const name=node("h2","",d.fruit||"Your fruit guide");
- const verdict=node("div","report-verdict");verdict.append(node("span","report-verdict-label","HEALTH CHECK"),node("strong","",safety));
- shade.append(top,name,verdict);
- if(d.portion||d.serving_size){const p=node("div","report-portion");p.append(node("span","","SUGGESTED PORTION"),node("strong","",d.portion||d.serving_size));shade.append(p);}
+ const top=node("div","report-fruit-top");top.append(node("span","report-eyebrow","YOUR FRUIT PROFILE"));
+ shade.append(top,node("h2","",d.fruit||"Your fruit guide"));
+ const season=d.season_in_india||d.indian_season||d.seasonal_availability||d.season;
+ if(season){const seasonText=typeof season==="object"?(season.months||season.typical_months||season.availability||"Seasonal availability"):season;shade.append(node("span","report-season","▦  "+(Array.isArray(seasonText)?seasonText.join(" · "):seasonText)));}
  hero.append(shade);result.append(hero);
- const stats=node("div","result-stats");
- addStat(stats,"GLYCEMIC INDEX",d.gi??d.glycemic_index,"Only when supplied by the clinical record");
- addStat(stats,"GLYCEMIC LOAD",d.gl??d.glycemic_load,"Serving-dependent; not inferred");
- addStat(stats,"POTASSIUM",d.potassium_mg!=null?d.potassium_mg+" mg":null,"Per stated serving, if verified");
- addStat(stats,"BEST TIME TO EAT",d.best_time,null);
- if(stats.childElementCount)result.append(stats);
- if(d.condition_assessments){
-  const assessments=Array.isArray(d.condition_assessments)?d.condition_assessments:Object.entries(d.condition_assessments).map(([condition,value])=>({condition,...(typeof value==="object"?value:{assessment:value})}));
-  assessments.forEach(a=>{const status=a.status||a.assessment||a.recommendation||"Individual assessment";const tone=verdictTone(status);const card=node("section","condition-result verdict-"+tone);card.append(node("div","report-section-kicker",a.condition||a.name||"HEALTH CONDITION"),node("strong","condition-status",status));if(a.explanation||a.reason||a.caveat)card.append(node("p","",a.explanation||a.reason||a.caveat));result.append(card);});
- }else if(d.diabetic_safety){section("DIABETES CONSIDERATION",d.diabetic_safety+" "+(d.diabetes_reason||""),"report-section-highlight");}
- section("PORTION & PRACTICAL GUIDANCE",d.portion||d.serving_size||d.portion_guidance||null);
- section("WHY THIS MATTERS",d.spoken_response||d.explanation||null);
- section("SMART PAIRING",d.pairing_tip||d.pairing||null);
- section("ADDITIONAL HEALTH NOTES",d.health_benefits||d.benefits||d.renal_safety||d.kidney_caution||null);
- section("EVIDENCE & SOURCES",d.sources||d.evidence_sources||d.references||null);
- if(!d.sources&&!d.evidence_sources&&!d.references){const note=node("section","report-source-note");note.append(node("div","report-section-kicker","EVIDENCE TRANSPARENCY"),node("p","","Source citations were not included in this response. FruitBuddie will not invent references or imply that an unverified value is clinically established."));result.append(note);}
- const indiaSeason=d.season_in_india||d.indian_season||d.seasonal_availability||d.season||null;
- if(indiaSeason&&indiaSeason!=="N/A"){
-  const seasonCard=node("section","report-section season-card");
-  seasonCard.append(node("div","report-section-kicker","IN SEASON IN INDIA"));
-  if(typeof indiaSeason==="object"){
-   const months=indiaSeason.months||indiaSeason.typical_months||indiaSeason.availability_months;
-   const detail=indiaSeason.note||indiaSeason.regional_note||indiaSeason.explanation||indiaSeason.availability;
-   if(months)seasonCard.append(node("p","season-months",Array.isArray(months)?months.join(" · "):months));
-   if(detail)seasonCard.append(node("p","",detail));
-   if(indiaSeason.regions)seasonCard.append(node("p","season-regions","Regional variation: "+(Array.isArray(indiaSeason.regions)?indiaSeason.regions.join(", "):indiaSeason.regions)));
-  }else seasonCard.append(node("p","season-months",indiaSeason));
-  if(!seasonCard.querySelector("p"))seasonCard.append(node("p","","Availability varies by region, variety and growing conditions."));
-  result.append(seasonCard);
+ const verdict=node("div","report-verdict "+(tone==="positive"?"positive":tone==="moderate"?"moderate":""));
+ verdict.append(node("div","report-verdict-icon",tone==="positive"?"✓":"⚕"));
+ const copy=node("div","report-verdict-copy");copy.append(node("span","report-verdict-label","CLINICAL ASSESSMENT"),node("strong","",String(safety).toUpperCase()),node("small","",d.portion||d.serving_size||"See the guidance below"));
+ verdict.append(copy);result.append(verdict);
+ const audioUrl=d.audio_url;
+ if(typeof audioUrl==="string"&&/^(data:audio\/|https?:\/\/)/i.test(audioUrl)){
+  const panel=node("div","report-audio-panel"),play=node("button","report-audio-play","▶"),content=node("div","report-audio-content");
+  content.append(node("b","","Listen to Clinical Advice"),node("small","","TAP TO REPLAY"));
+  const audio=node("audio");audio.controls=true;audio.preload="none";audio.src=audioUrl;content.append(audio);
+  play.addEventListener("click",()=>{audio.currentTime=0;audio.play().catch(()=>{});});panel.append(play,content);result.append(panel);
  }
- if(typeof d.audio_url==="string"&&/^(data:audio\/|https?:\/\/)/i.test(d.audio_url)){
-  const wrap=node("div","result-audio"),audio=node("audio");audio.controls=true;audio.preload="none";audio.src=d.audio_url;wrap.append(node("div","report-section-kicker","LISTEN TO YOUR ANSWER"),audio);result.append(wrap);
+ const stats=node("div","report-stat-grid");
+ const gi=d.gi??d.glycemic_index,gl=d.gl??d.glycemic_load,k=d.potassium_mg;
+ function stat(label,sub,value,tag,tagClass){const card=node("div","report-stat-card"),head=node("div","report-stat-head");head.append(node("span","",label),node("span","report-stat-tag "+(tagClass||""),tag||"N/A"));card.append(head,node("div","report-stat-sub",sub),node("div","report-stat-value",value==null||value===""?"—":String(value)));const bar=node("div","report-stat-bar");card.append(bar);stats.append(card);}
+ stat("♧ GI","Glycemic Index",gi,gi==null?"N/A":Number(gi)>=70?"HIGH":Number(gi)>=56?"MEDIUM":"LOW",gi==null?"":Number(gi)>=70?"high":"low");
+ stat("ϟ GL","Glycemic Load",gl,gl==null?"N/A":Number(gl)<=10?"LOW":Number(gl)<=19?"MEDIUM":"HIGH",gl==null?"":Number(gl)<=10?"low":"high");
+ stat("K⁺","Potassium / 100 g",k==null?null:k+" mg",k==null?"N/A":"RECORDED","");
+ result.append(stats);
+ if(d.condition_assessments){
+  const panel=node("div","report-panel");panel.append(node("div","report-panel-title","♡  CONDITION-WISE ASSESSMENT"));
+  const assessments=Array.isArray(d.condition_assessments)?d.condition_assessments:Object.entries(d.condition_assessments).map(([condition,value])=>({condition,...(typeof value==="object"?value:{assessment:value})}));
+  assessments.forEach(a=>{const row=node("div","report-condition-row");const name=node("span","report-condition-name",a.condition||a.name||"Health condition");const status=a.status||a.assessment||a.recommendation||"No data";row.append(name,node("span","report-condition-status "+(status==="No data"?"":"known"),String(status).toUpperCase()));panel.append(row);});
+  result.append(panel);
+ }
+ const best=d.best_time||d.best_time_to_eat;
+ if(best){const panel=node("div","report-best-time");panel.append(node("div","","◷"),node("div","", " "));panel.lastChild.append(node("b","","BEST TIME TO EAT"),node("strong","",best));result.append(panel);}
+ const transcript=d.spoken_response||d.explanation||d.voice_transcript;
+ if(transcript){const panel=node("div","report-transcript");panel.append(node("div","report-panel-title","❞  VOICE TRANSCRIPT"),node("p","",transcript));result.append(panel);}
+ const pairing=d.pairing_tip||d.pairing||d.smart_pairings;
+ if(pairing){const panel=node("div","report-pairing");panel.append(node("div","report-panel-title","♡  SMART PAIRINGS & ADVICE"),node("p","",pairing));result.append(panel);}
+ const sources=d.sources||d.evidence_sources||d.references;
+ if(sources){
+  const panel=node("div","report-panel");panel.append(node("div","report-panel-title","♢  CLINICALLY VERIFIED SOURCES"));
+  const grid=node("div","report-sources");const entries=Array.isArray(sources)?sources:Object.entries(sources).map(([name,detail])=>({name,detail}));
+  entries.forEach(s=>{const card=node("div","report-source-card");card.append(node("b","",typeof s==="string"?s:(s.name||s.title||s.source||"Clinical source")),node("span","",typeof s==="string"?"":(s.detail||s.description||s.reference||s.url||"Reference supplied by clinical data")));grid.append(card);});
+  panel.append(grid);panel.append(node("p","report-disclaimer","Guidance is informational and not a substitute for advice from your doctor or dietitian."));result.append(panel);
  }
  return true;
 }
