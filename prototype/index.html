@@ -58,6 +58,28 @@ async function ask(event){
  finally{button.disabled=false;button.textContent="Ask FruitBuddie ↗";}
 }
 form.addEventListener("submit",ask);
+// Submit naturally after the user finishes typing; keep the button and Enter as immediate alternatives.
+let typingTimer=null,lastSubmitted="";
+input.addEventListener("input",()=>{
+ clearTimeout(typingTimer);
+ const query=input.value.trim();
+ if(query.length<5)return;
+ typingTimer=setTimeout(()=>{
+  const current=input.value.trim();
+  if(current.length>=5&&current!==lastSubmitted&&!button.disabled){
+   lastSubmitted=current;
+   ask();
+  }
+ },1400);
+});
+input.addEventListener("keydown",event=>{
+ if(event.key==="Enter"&&!event.isComposing){
+  event.preventDefault();clearTimeout(typingTimer);lastSubmitted=input.value.trim();ask();
+ }
+});
+language.addEventListener("change",()=>{
+ document.querySelectorAll(".lang").forEach(b=>b.classList.toggle("active",b.dataset.lang===language.value));
+});
 const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
 function voiceMessage(message,isError=false){voiceStatus.textContent=message;voiceStatus.classList.toggle("error",isError);}
 if(!window.isSecureContext){micButton.disabled=true;voiceMessage("Voice input requires a secure HTTPS connection.",true);}
