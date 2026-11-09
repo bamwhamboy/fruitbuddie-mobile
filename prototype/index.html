@@ -75,9 +75,28 @@ body{min-height:100vh;background:radial-gradient(ellipse at 50% 10%,#effffb 0,#c
 .disclaimer{max-width:390px;margin:16px auto 0;font-size:9px}
 @media(min-width:700px){body{padding:30px 16px}.app{max-width:480px}}
 @media(max-width:520px){body{padding:0;background:#c9f5eb}.app{max-width:none;min-height:100vh;margin:0;padding:20px 17px 28px;border:0;border-radius:0;box-shadow:none}.topbar{margin-bottom:18px}.hero h1{font-size:22px}.main-card{padding:15px}.fruit-list{gap:5px}.fruit-thumb{width:38px;height:38px}.fruit-name{font-size:8px}}
+
+/* Dark theme */
+html[data-theme="dark"]{color-scheme:dark;--ink:#e7f1eb;--muted:#a3b5aa;--green:#39c6a2;--mint:#183d35;--lime:#b9eedc;--paper:#101b18;--white:#182722;--line:#2a4038;--shadow:0 12px 32px #0005}
+html[data-theme="dark"]{background:#0c1714}
+html[data-theme="dark"] body{background:radial-gradient(ellipse at 50% 10%,#1a3b32 0,#0c1714 72%)}
+html[data-theme="dark"] .app{background:#14221d;border-color:#294138;box-shadow:0 22px 70px #0007}
+html[data-theme="dark"] .hero{background:linear-gradient(115deg,#126c59,#168b70)}
+html[data-theme="dark"] .main-card,html[data-theme="dark"] .side-card,html[data-theme="dark"] .context,html[data-theme="dark"] .report-section,html[data-theme="dark"] .condition-result,html[data-theme="dark"] .result-detail,html[data-theme="dark"] .report-panel,html[data-theme="dark"] .report-transcript,html[data-theme="dark"] .report-pairing,html[data-theme="dark"] .report-best-time,html[data-theme="dark"] .report-source-note,html[data-theme="dark"] .report-audio-panel,html[data-theme="dark"] .result-stat{background:#1b2d26;border-color:#30483e;color:#e7f1eb}
+html[data-theme="dark"] .card-label,html[data-theme="dark"] .examples-head b,html[data-theme="dark"] .side-card h2,html[data-theme="dark"] .report-verdict strong,html[data-theme="dark"] .report-section p,html[data-theme="dark"] .condition-result p,html[data-theme="dark"] .result-detail p,html[data-theme="dark"] .report-transcript p,html[data-theme="dark"] .report-pairing p{color:#e1eee6}
+html[data-theme="dark"] .ask,html[data-theme="dark"] .prompt,html[data-theme="dark"] .fruit-choice,html[data-theme="dark"] .report-empty,html[data-theme="dark"] .report-stat-card,html[data-theme="dark"] .report-source-card,html[data-theme="dark"] .report-verdict{background:#20372e;border-color:#385447}
+html[data-theme="dark"] .prompt input{color:#eef7f1}
+html[data-theme="dark"] .prompt input::placeholder,html[data-theme="dark"] .answer-language,html[data-theme="dark"] .report-stat-sub,html[data-theme="dark"] .report-fact b,html[data-theme="dark"] .report-source-card span,html[data-theme="dark"] .report-disclaimer{color:#a5b8ad}
+html[data-theme="dark"] .condition-chip span{background:#20372e;border-color:#3a5548;color:#c1d2c7}
+html[data-theme="dark"] .condition-chip input:checked+span,html[data-theme="dark"] .fruit-choice.active{background:#245443;border-color:#4e9a7d;color:#fff}
+html[data-theme="dark"] .fruit-thumb,html[data-theme="dark"] .benefit-icon,html[data-theme="dark"] .report-empty .symbol{background:#29483b;color:#a9e6ce}
+html[data-theme="dark"] .report-condition-row{border-color:#30483e}
+html[data-theme="dark"] .report-condition-status,html[data-theme="dark"] .report-verdict-label,html[data-theme="dark"] .report-section-kicker,html[data-theme="dark"] .report-panel-title,html[data-theme="dark"] .report-stat-head{color:#a8c7b5}
+.theme-toggle{border:1px solid var(--line);background:var(--white);color:var(--ink);border-radius:30px;padding:8px 11px;font-size:10px;font-weight:700;cursor:pointer}
+.topbar{gap:10px}.topbar .top-note{margin-left:auto}
 </style></head>
 <body><main class="app">
-<header class="topbar"><div class="brand"><span class="brand-mark">✳</span>FruitBuddie</div><div class="top-note"><span class="live-dot"></span> A little more confident, every day</div></header>
+<header class="topbar"><div class="brand"><span class="brand-mark">✳</span>FruitBuddie</div><div class="top-note"><span class="live-dot"></span> A little more confident, every day</div><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode">☾ Dark</button></header>
 <section class="hero"><span class="eyebrow">✦ YOUR EVERYDAY FRUIT COMPANION</span><h1>Good choices start<br>with <em>good fruit.</em></h1><p>Wondering if a fruit fits your health needs? Just ask. We'll make the answer simple, practical and personal.</p></section>
 <div class="workspace"><section class="main-card">
 <div class="card-label"><span>Ask FruitBuddie</span><small>Text or voice · replies in your language</small></div>
@@ -92,6 +111,12 @@ body{min-height:100vh;background:radial-gradient(ellipse at 50% 10%,#effffb 0,#c
 <p class="disclaimer">FruitBuddie shares general nutrition information, not a medical diagnosis or a replacement for advice from your doctor or dietitian.</p>
 </main><script>
 (()=>{
+const themeButton=document.getElementById("theme-toggle");
+const savedTheme=localStorage.getItem("fruitbuddie-theme");
+if(savedTheme==="dark")document.documentElement.dataset.theme="dark";
+function syncThemeButton(){const dark=document.documentElement.dataset.theme==="dark";themeButton.textContent=dark?"☀ Light":"☾ Dark";themeButton.setAttribute("aria-label",dark?"Switch to light mode":"Switch to dark mode");}
+syncThemeButton();
+themeButton.addEventListener("click",()=>{const dark=document.documentElement.dataset.theme!=="dark";document.documentElement.dataset.theme=dark?"dark":"light";localStorage.setItem("fruitbuddie-theme",dark?"dark":"light");syncThemeButton();});
 const form=document.getElementById("ask-form"),input=document.getElementById("question-input"),button=document.getElementById("ask-button"),micButton=document.getElementById("mic-button"),voiceStatus=document.getElementById("voice-status"),result=document.getElementById("ask-result"),suggestions=document.querySelectorAll(".suggestion");
 const selected=()=>Array.from(document.querySelectorAll('input[name="condition"]:checked')).map(x=>x.value);
 const goal=()=>document.getElementById("goal")?.value||"General fruit guidance";
@@ -195,7 +220,13 @@ input.addEventListener("keydown",event=>{
  }
 });
 
-let mediaRecorder=null,recordedChunks=[],recordingStream=null,voiceBusy=false,recordingLimit=null;
+let mediaRecorder=null,recordedChunks=[],recordingStream=null,voiceBusy=false,recordingLimit=null,audioContext=null,analyser=null,silenceFrame=null,speechDetectedAt=0,lastVoiceAt=0;
+function stopSilenceMonitor(){if(silenceFrame)cancelAnimationFrame(silenceFrame);silenceFrame=null;if(audioContext){audioContext.close().catch(()=>{});audioContext=null;}analyser=null;}
+function monitorSilence(stream){
+ try{audioContext=new (window.AudioContext||window.webkitAudioContext)();const source=audioContext.createMediaStreamSource(stream);analyser=audioContext.createAnalyser();analyser.fftSize=2048;source.connect(analyser);const samples=new Uint8Array(analyser.fftSize);speechDetectedAt=0;lastVoiceAt=0;
+ const tick=()=>{if(!mediaRecorder||mediaRecorder.state!=="recording"||!analyser)return;analyser.getByteTimeDomainData(samples);let sum=0;for(let i=0;i<samples.length;i++){const v=(samples[i]-128)/128;sum+=v*v;}const rms=Math.sqrt(sum/samples.length);const now=Date.now();if(rms>0.018){if(!speechDetectedAt)speechDetectedAt=now;lastVoiceAt=now;}if(speechDetectedAt&&now-lastVoiceAt>1700){voiceMessage("Speech detected. Finishing your question…");mediaRecorder.stop();return;}silenceFrame=requestAnimationFrame(tick);};silenceFrame=requestAnimationFrame(tick);
+ }catch(e){voiceMessage("Auto-stop unavailable in this browser. Tap the microphone to finish.");}
+}
 function voiceMessage(message,isError=false){
  voiceStatus.textContent=message;
  voiceStatus.classList.toggle("error",isError);
