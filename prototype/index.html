@@ -127,8 +127,25 @@ function renderStructured(data){
   const audio=node("audio");audio.controls=true;audio.preload="metadata";audio.src=playableAudioUrl;
   audio.addEventListener("error",()=>voiceMessage("Audio playback failed. Please try again.",true));
   content.append(audio);
-  play.addEventListener("click",()=>{audio.currentTime=0;audio.play().catch(()=>voiceMessage("Could not play audio. Check your device sound settings.",true));});
+  const playAudio=()=>{audio.currentTime=0;return audio.play();};
+  play.addEventListener("click",()=>{playAudio().catch(()=>voiceMessage("Could not play audio. Check your device sound settings.",true));});
   panel.append(play,content);result.append(panel);
+  // Speak automatically; if browser autoplay policy blocks the audio file, use the device's speech engine.
+  setTimeout(()=>{
+   playAudio().then(()=>voiceMessage("Speaking the answer…")).catch(()=>{
+    const spoken=d.spoken_response||d.explanation||d.voice_transcript;
+    if("speechSynthesis" in window&&spoken){
+     window.speechSynthesis.cancel();
+     const utterance=new SpeechSynthesisUtterance(String(spoken));
+     const languageMap={en:"en-IN",hi:"hi-IN",te:"te-IN",ta:"ta-IN",kn:"kn-IN",ml:"ml-IN",mr:"mr-IN",bn:"bn-IN",gu:"gu-IN",pa:"pa-IN",or:"or-IN"};
+     const code=String(d.language_code||"en").toLowerCase().split(/[-_]/)[0];
+     utterance.lang=languageMap[code]||"en-IN";
+     utterance.onstart=()=>voiceMessage("Speaking the answer…");
+     utterance.onerror=()=>voiceMessage("Audio playback was blocked. Tap Listen to hear the answer.",true);
+     window.speechSynthesis.speak(utterance);
+    }else voiceMessage("Tap Listen to hear the answer.",true);
+   });
+  },250);
  }
  const stats=node("div","report-stat-grid");
  const gi=d.gi??d.glycemic_index,gl=d.gl??d.glycemic_load,k=d.potassium_mg;
@@ -182,65 +199,66 @@ input.addEventListener("keydown",event=>{
  }
 });
 
-let mediaRecorder=null,recordedChunks=[],recordingStream=null,voiceBusy=false,recordingLimit=null;
+let mediaRecorder=null,recordedChunks=[],recordingStream=null,voiceBusy=false,recordingLimit=null,silenceCheck=null,audioContext=null,analyser=null,speechDetected=false,lastSoundAt=0;
 function voiceMessage(message,isError=false){
- voiceStatus.textContent=message;
- voiceStatus.classList.toggle("error",isError);
- voiceStatus.style.color=isError?"#b84e39":"#718078";
+ voiceStatus.textContent=message;voiceStatus.classList.toggle("error",isError);voiceStatus.style.color=isError?"#b84e39":"#718078";
 }
 function setMicState(listening){
- micButton.classList.toggle("listening",listening);
- micButton.classList.toggle("busy",voiceBusy&&!listening);
- micButton.setAttribute("aria-label",listening?"Stop recording":"Start voice input");
- micButton.title=listening?"Stop recording":"Speak your question";
- micButton.innerHTML=listening
-  ? '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"></rect></svg>'
-  : '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2.5" width="6" height="12" rx="3"></rect><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3.5M8.5 21.5h7"></path></svg>';
+ micButton.classList.toggle("listening",listening);micButton.classList.toggle("busy",voiceBusy&&!listening);
+ micButton.setAttribute("aria-label",listening?"Stop recording":"Start voice input");micButton.title=listening?"Stop recording":"Speak your question";
+ micButton.innerHTML=listening?'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"></rect></svg>':'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2.5" width="6" height="12" rx="3"></rect><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3.5M8.5 21.5h7"></path></svg>';
 }
 async function transcribeRecording(blob){
- const base64=await new Promise((resolve,reject)=>{
-  const reader=new FileReader();
-  reader.onload=()=>resolve(String(reader.result).split(",")[1]||"");
-  reader.onerror=()=>reject(new Error("Could not read the recording."));
-  reader.readAsDataURL(blob);
- });
+ const base64=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(",")[1]||"");reader.onerror=()=>reject(new Error("Could not read the recording."));reader.readAsDataURL(blob);});
  const response=await fetch("/api/transcribe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({audio_base64:base64,mime_type:blob.type||"audio/webm"})});
- const data=await response.json().catch(()=>({}));
- if(!response.ok)throw new Error(data.error||"Speech transcription failed.");
- const transcript=(data.transcript||"").trim();
- if(!transcript)throw new Error("No speech was detected. Please try again.");
- input.value=transcript;
- voiceMessage("Heard: "+transcript);
- ask();
+ const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||"Speech transcription failed.");
+ const transcript=(data.transcript||"").trim();if(!transcript)throw new Error("No speech was detected. Please try again.");
+ input.value=transcript;voiceMessage("You asked: "+transcript);await ask();
+}
+function stopSilenceMonitor(){
+ if(silenceCheck){clearInterval(silenceCheck);silenceCheck=null;}
+ if(audioContext){audioContext.close().catch(()=>{});audioContext=null;}analyser=null;
+}
+function monitorSilence(){
+ try{
+  audioContext=new (window.AudioContext||window.webkitAudioContext)();
+  analyser=audioContext.createAnalyser();analyser.fftSize=512;
+  audioContext.createMediaStreamSource(recordingStream).connect(analyser);
+  const samples=new Uint8Array(analyser.fftSize);
+  speechDetected=false;lastSoundAt=Date.now();
+  silenceCheck=setInterval(()=>{
+   if(!analyser||mediaRecorder?.state!=="recording")return;
+   analyser.getByteTimeDomainData(samples);let energy=0;
+   for(let i=0;i<samples.length;i++){const v=(samples[i]-128)/128;energy+=v*v;}
+   const rms=Math.sqrt(energy/samples.length);
+   if(rms>0.025){speechDetected=true;lastSoundAt=Date.now();}
+   if(speechDetected&&Date.now()-lastSoundAt>1100){voiceMessage("Done listening. Sending your question…");mediaRecorder.stop();}
+  },120);
+ }catch{voiceMessage("Listening… your question will be sent when you pause.");}
 }
 micButton.addEventListener("click",async()=>{
  if(voiceBusy)return;
  if(mediaRecorder&&mediaRecorder.state==="recording"){mediaRecorder.stop();return;}
- if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){
-  voiceMessage("Voice recording is not supported in this browser. Please type your question.",true);return;
- }
+ if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){voiceMessage("Voice recording is not supported in this browser. Please type your question.",true);return;}
  try{
   voiceBusy=true;setMicState(false);voiceMessage("Requesting microphone access…");
   recordingStream=await navigator.mediaDevices.getUserMedia({audio:true});
   const preferred=["audio/webm;codecs=opus","audio/webm","audio/mp4"].find(type=>MediaRecorder.isTypeSupported(type));
   mediaRecorder=new MediaRecorder(recordingStream,preferred?{mimeType:preferred}:{});
-  recordedChunks=[];
-  mediaRecorder.ondataavailable=event=>{if(event.data&&event.data.size)recordedChunks.push(event.data);};
-  mediaRecorder.onerror=()=>{voiceMessage("Recording failed. Please try again.",true);};
+  recordedChunks=[];mediaRecorder.ondataavailable=e=>{if(e.data&&e.data.size)recordedChunks.push(e.data);};
+  mediaRecorder.onerror=()=>voiceMessage("Recording failed. Please try again.",true);
   mediaRecorder.onstop=async()=>{
-   clearTimeout(recordingLimit);voiceBusy=true;
+   clearTimeout(recordingLimit);stopSilenceMonitor();voiceBusy=true;
    const blob=new Blob(recordedChunks,{type:mediaRecorder.mimeType||"audio/webm"});
-   recordingStream?.getTracks().forEach(track=>track.stop());recordingStream=null;
-   setMicState(false);voiceMessage("Transcribing your question…");
-   try{await transcribeRecording(blob);}
-   catch(error){voiceMessage(error.message||"Could not transcribe audio.",true);}
+   recordingStream?.getTracks().forEach(t=>t.stop());recordingStream=null;setMicState(false);voiceMessage("Transcribing your question…");
+   try{await transcribeRecording(blob);}catch(error){voiceMessage(error.message||"Could not transcribe audio.",true);}
    finally{voiceBusy=false;mediaRecorder=null;setMicState(false);}
   };
-  voiceBusy=false;mediaRecorder.start();setMicState(true);
-  voiceMessage("Recording… tap the microphone again when you’re done. Max 25 seconds.");
-  recordingLimit=setTimeout(()=>{if(mediaRecorder?.state==="recording"){voiceMessage("25-second limit reached. Transcribing…");mediaRecorder.stop();}},25000);
+  mediaRecorder.start();voiceBusy=false;setMicState(true);voiceMessage("Listening… pause for a moment when you finish. Your question will send automatically.");
+  monitorSilence();
+  recordingLimit=setTimeout(()=>{if(mediaRecorder?.state==="recording"){voiceMessage("Time limit reached. Sending your question…");mediaRecorder.stop();}},25000);
  }catch(error){
-  voiceBusy=false;recordingStream?.getTracks().forEach(track=>track.stop());recordingStream=null;setMicState(false);
+  voiceBusy=false;recordingStream?.getTracks().forEach(t=>t.stop());recordingStream=null;stopSilenceMonitor();setMicState(false);
   const message=error.name==="NotAllowedError"?"Microphone permission is blocked. Allow it in Chrome's site settings and try again.":error.name==="NotFoundError"?"No microphone was found. Connect or enable a microphone.":error.name==="NotReadableError"?"Your microphone is busy. Close other apps using it and try again.":(error.message||"Could not start microphone.");
   voiceMessage(message,true);
  }
