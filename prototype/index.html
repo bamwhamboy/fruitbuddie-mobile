@@ -24,6 +24,57 @@
 .disclaimer{max-width:760px;margin:25px auto 0;text-align:center;color:#9aa49a;font-size:10px;line-height:1.6}
 @media(max-width:850px){.app{padding:20px 20px 30px}.topbar{margin-bottom:42px}.workspace{grid-template-columns:1fr}.side-card{display:none}.hero{margin-bottom:25px}.main-card{max-width:720px;width:100%;margin:auto}}
 @media(max-width:520px){.app{padding:14px 13px 25px}.topbar{height:42px;margin-bottom:34px}.brand{font-size:18px}.brand-mark{width:34px;height:34px}.top-note{font-size:10px}.hero h1{font-size:37px;letter-spacing:-1.7px}.hero p{font-size:13px}.main-card{padding:15px;border-radius:21px}.prompt input{font-size:13px}.prompt-bottom{align-items:center}.primary{padding:12px 13px;font-size:10px}.mic-button{width:40px;height:40px;flex-basis:40px}.fruit-list{gap:6px}.fruit-choice{padding:10px 2px;border-radius:13px}.fruit-thumb{width:35px;height:35px;font-size:20px}.fruit-name{font-size:9px}.report-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.report-fruit-hero{min-height:185px}.report-fruit-hero h2{font-size:28px}.report-facts{grid-template-columns:1fr}.report-sources{grid-template-columns:1fr}.condition-options{gap:6px}.condition-chip span{padding:7px 9px;font-size:9px}}
+
+/* Reference-inspired FruitBuddie mobile app skin */
+:root{--ink:#202b27;--muted:#7b8b84;--green:#17a887;--mint:#dff8f1;--lime:#c8f4e9;--paper:#e9faf5;--white:#fff;--line:#e9efec;--shadow:0 12px 32px #245c4b12}
+html{background:#c9f5eb}
+body{min-height:100vh;background:radial-gradient(ellipse at 50% 10%,#effffb 0,#c9f5eb 70%);padding:22px 12px}
+.app{max-width:480px;min-height:calc(100vh - 44px);margin:auto;padding:22px 18px 30px;background:#f8fbfa;border:1px solid #ffffffb5;border-radius:34px;box-shadow:0 22px 70px #215e4d20}
+.topbar{height:42px;margin-bottom:19px}
+.brand{gap:10px;font-size:17px;letter-spacing:-.4px}
+.brand-mark{width:36px;height:36px;border-radius:13px;background:#19ad8a;color:white}
+.top-note{font-size:10px}
+.hero{margin:0 0 17px;text-align:left;padding:19px 17px 17px;border-radius:19px;background:linear-gradient(115deg,#18ae8c,#23c4a2);color:#fff;position:relative;overflow:hidden;min-height:124px}
+.hero:after{content:"🍊";position:absolute;right:16px;bottom:3px;font-size:65px;filter:drop-shadow(0 7px 8px #12634c33);opacity:.95}
+.eyebrow{padding:0;background:transparent;color:#d8fff4;font-size:8px;letter-spacing:1.6px}
+.hero h1{margin:10px 80px 6px 0;font:800 22px/1.15 Manrope;letter-spacing:-.7px;color:#fff}
+.hero h1 em{color:#d7fff2}
+.hero p{margin:0;max-width:245px;color:#e6fff8;font-size:10px;line-height:1.5}
+.workspace{display:block}
+.main-card{padding:16px;border:0;border-radius:22px;background:#fff;box-shadow:0 8px 28px #244b3b0c}
+.card-label{margin-bottom:10px;color:#263c34;font-size:12px;letter-spacing:.2px;text-transform:none}
+.card-label small{font-size:9px;color:#92a19a}
+.ask{padding:5px;border:0;border-radius:15px;background:#f1f4f2}
+.prompt{padding:1px 8px 3px}
+.prompt:before{content:"⌕";font-size:22px;color:#9aa9a2}
+.prompt input{padding:11px 2px;font-size:12px}
+.prompt-bottom{padding:4px 4px 3px 10px}
+.answer-language{font-size:9px}
+.mic-button{width:37px;height:37px;flex-basis:37px;border:0;background:#e2f7f0;color:#139b7d}
+.primary{padding:11px 14px;border-radius:11px;background:#19a987;font-size:10px}
+.context{margin-top:12px;border:0;border-radius:14px;background:#f6f8f7}
+.context summary{padding:12px 13px;font-size:10px}
+.condition-options{padding:0 12px 12px}
+.condition-chip span{font-size:9px;padding:7px 9px}
+.examples{margin-top:18px}
+.examples-head{margin-bottom:10px}
+.examples-head b{font-size:12px;color:#263c34}
+.examples-head span{font-size:9px}
+.fruit-list{grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}
+.fruit-choice{border:0;border-radius:13px;background:#f1f8f5;padding:9px 3px 10px;gap:5px}
+.fruit-choice:hover,.fruit-choice.active{background:#ddf6ed;border:0;transform:translateY(-1px)}
+.fruit-thumb{width:42px;height:42px;border-radius:13px;background:#dff4ec;font-size:24px}
+.fruit-name{font-size:9px;color:#34483f}
+.report-empty{margin-top:16px;padding:17px 12px;border-radius:15px;background:#f3f8f5}
+.report-empty .symbol{background:#def5eb;color:#18a585}
+.report-empty h2{font-size:12px}
+.report-empty p{font-size:9px}
+.answer{margin-top:14px}
+.report-fruit-hero{min-height:190px}
+.side-card{display:none}
+.disclaimer{max-width:390px;margin:16px auto 0;font-size:9px}
+@media(min-width:700px){body{padding:30px 16px}.app{max-width:480px}}
+@media(max-width:520px){body{padding:0;background:#c9f5eb}.app{max-width:none;min-height:100vh;margin:0;padding:20px 17px 28px;border:0;border-radius:0;box-shadow:none}.topbar{margin-bottom:18px}.hero h1{font-size:22px}.main-card{padding:15px}.fruit-list{gap:5px}.fruit-thumb{width:38px;height:38px}.fruit-name{font-size:8px}}
 </style></head>
 <body><main class="app">
 <header class="topbar"><div class="brand"><span class="brand-mark">✳</span>FruitBuddie</div><div class="top-note"><span class="live-dot"></span> A little more confident, every day</div></header>
