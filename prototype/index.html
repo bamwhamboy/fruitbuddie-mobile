@@ -478,7 +478,7 @@ let mediaRecorder=null,recordedChunks=[],recordingStream=null,voiceBusy=false,re
 function stopSilenceMonitor(){if(silenceFrame)cancelAnimationFrame(silenceFrame);silenceFrame=null;if(audioContext){audioContext.close().catch(()=>{});audioContext=null;}analyser=null;}
 function monitorSilence(stream){
  try{audioContext=new (window.AudioContext||window.webkitAudioContext)();const source=audioContext.createMediaStreamSource(stream);analyser=audioContext.createAnalyser();analyser.fftSize=2048;source.connect(analyser);const samples=new Uint8Array(analyser.fftSize);speechDetectedAt=0;lastVoiceAt=0;
- const tick=()=>{if(!mediaRecorder||mediaRecorder.state!=="recording"||!analyser)return;analyser.getByteTimeDomainData(samples);let sum=0;for(let i=0;i<samples.length;i++){const v=(samples[i]-128)/128;sum+=v*v;}const rms=Math.sqrt(sum/samples.length);const now=Date.now();if(rms>0.018){if(!speechDetectedAt)speechDetectedAt=now;lastVoiceAt=now;}if(speechDetectedAt&&now-lastVoiceAt>1700){voiceMessage("Speech detected. Finishing your question…");mediaRecorder.stop();return;}silenceFrame=requestAnimationFrame(tick);};silenceFrame=requestAnimationFrame(tick);
+ const tick=()=>{if(!mediaRecorder||mediaRecorder.state!=="recording"||!analyser)return;analyser.getByteTimeDomainData(samples);let sum=0;for(let i=0;i<samples.length;i++){const v=(samples[i]-128)/128;sum+=v*v;}const rms=Math.sqrt(sum/samples.length);const now=Date.now();if(rms>0.018){if(!speechDetectedAt)speechDetectedAt=now;lastVoiceAt=now;}if(speechDetectedAt&&now-lastVoiceAt>1200){voiceMessage("Speech detected. Finishing your question…");mediaRecorder.stop();return;}silenceFrame=requestAnimationFrame(tick);};silenceFrame=requestAnimationFrame(tick);
  }catch(e){voiceMessage("Auto-stop unavailable in this browser. Tap the microphone to finish.");}
 }
 function voiceMessage(message,isError=false){
@@ -526,7 +526,7 @@ micButton.addEventListener("click",async()=>{
   mediaRecorder.ondataavailable=event=>{if(event.data&&event.data.size)recordedChunks.push(event.data);};
   mediaRecorder.onerror=()=>{voiceMessage("Recording failed. Please try again.",true);};
   mediaRecorder.onstop=async()=>{
-   clearTimeout(recordingLimit);voiceBusy=true;
+   clearTimeout(recordingLimit);stopSilenceMonitor();voiceBusy=true;
    const blob=new Blob(recordedChunks,{type:mediaRecorder.mimeType||"audio/webm"});
    recordingStream?.getTracks().forEach(track=>track.stop());recordingStream=null;
    setMicState(false);voiceMessage("Transcribing your question…");
@@ -534,8 +534,8 @@ micButton.addEventListener("click",async()=>{
    catch(error){voiceMessage(error.message||"Could not transcribe audio.",true);}
    finally{voiceBusy=false;mediaRecorder=null;setMicState(false);}
   };
-  voiceBusy=false;mediaRecorder.start();setMicState(true);
-  voiceMessage("Recording… tap the microphone again when you’re done. Max 25 seconds.");
+  voiceBusy=false;mediaRecorder.start();setMicState(true);monitorSilence(recordingStream);
+  voiceMessage("Listening… I’ll send your question when you finish speaking.");
   recordingLimit=setTimeout(()=>{if(mediaRecorder?.state==="recording"){voiceMessage("25-second limit reached. Transcribing…");mediaRecorder.stop();}},25000);
  }catch(error){
   voiceBusy=false;recordingStream?.getTracks().forEach(track=>track.stop());recordingStream=null;setMicState(false);
