@@ -347,6 +347,65 @@ html[data-theme="dark"] .hero-tags span{color:#e6f0e9}
  .disclaimer{font-size:9px;line-height:1.6}
 }
 
+
+
+/* FruitBuddie UI polish — v3 */
+:root{--ink:#19372b;--green:#176b4c;--line:#e5ece4}
+body{background:linear-gradient(180deg,#eaf2e8 0,#f5f7f2 420px,#f5f7f2 100%)}
+.app{padding-top:24px}
+.topbar{margin-bottom:22px}
+.hero{min-height:270px;border-radius:30px;padding:clamp(28px,4.8vw,58px);box-shadow:0 24px 60px #123d2a22}
+.hero h1{max-width:590px}
+.workspace{gap:22px}
+.main-card{border-radius:26px;box-shadow:0 16px 42px #193d2b0d}
+.side-card{border-radius:26px;box-shadow:0 16px 42px #193d2b0d}
+.context{overflow:hidden}
+.context summary{font-size:13px}
+.condition-chip span{border-radius:12px}
+.condition-chip input:checked+span{box-shadow:inset 0 0 0 1px #8bb89a}
+.question-heading{display:flex;flex-direction:column}
+.question-heading span{font-weight:800}
+.ask{background:#f8faf7;border-radius:20px}
+.prompt input{min-height:48px}
+.mic-button{width:48px;height:48px;flex-basis:48px;box-shadow:0 4px 12px #17674712}
+.mic-button:hover{transform:translateY(-1px);background:#dff1e5}
+.primary{min-height:48px;padding-inline:22px;font-size:12px}
+.fruit-choice{overflow:hidden;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+.fruit-choice:hover,.fruit-choice.active{transform:translateY(-3px);box-shadow:0 14px 28px #173c2715}
+.fruit-photo{height:132px;overflow:hidden}
+.fruit-photo img{transition:transform .35s ease}
+.fruit-choice:hover .fruit-photo img{transform:scale(1.06)}
+.report-empty{margin-top:22px}
+.answer.show{scroll-margin-top:20px}
+.report-fruit-hero{min-height:260px}
+.report-stat-card{border-radius:16px}
+.report-stat-value{color:#1b6447}
+.report-audio-panel{background:#f7faf6}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid #78b78e;outline-offset:3px}
+html[data-theme="dark"] body{background:linear-gradient(180deg,#10241c 0,#0c1713 460px,#0c1713 100%)}
+html[data-theme="dark"] .main-card,html[data-theme="dark"] .side-card{background:#172820;border-color:#2a4337}
+html[data-theme="dark"] .context{background:#1c3026;border-color:#304b3d}
+html[data-theme="dark"] .context summary{color:#dcece1}
+html[data-theme="dark"] .ask{background:#20352b;border-color:#385747}
+html[data-theme="dark"] .primary{background:#21815d}
+html[data-theme="dark"] .report-audio-panel{background:#1b3026}
+@media(max-width:900px){.hero{min-height:245px}.workspace{grid-template-columns:1fr}.side-card{display:block}.benefit-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){
+ .app{padding:14px 13px 28px}
+ .topbar{margin-bottom:13px}
+ .hero{min-height:0;padding:25px 20px;margin-bottom:14px;border-radius:22px}
+ .hero h1{font-size:37px;letter-spacing:-1.8px}
+ .hero p{font-size:11px}
+ .main-card{padding:15px;border-radius:20px}
+ .question-heading{margin-top:22px}
+ .prompt input{min-height:42px}
+ .mic-button{width:42px;height:42px;flex-basis:42px}
+ .primary{min-height:42px;padding:11px 13px;font-size:10px}
+ .fruit-photo{height:124px}
+ .side-card{display:none}
+ .report-fruit-hero{min-height:205px}
+}
+
 </style></head>
 <body><main class="app">
 <header class="topbar"><div class="brand"><span class="brand-mark">✳</span>FruitBuddie</div><div class="top-note"><span class="live-dot"></span> Personalised nutrition · Voice first</div><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode">☾ Dark</button></header>
