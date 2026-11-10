@@ -1,123 +1,62 @@
-import React, { useMemo, useState } from "react";
-import { ActivityIndicator, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import React, { useMemo, useRef, useState } from "react";
+import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { Audio } from "expo-av";
 import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from "expo-speech-recognition";
 
-const LANGUAGES = [
-  { label: "English", code: "en-IN" }, { label: "हिन्दी", code: "hi-IN" },
-  { label: "తెలుగు", code: "te-IN" }, { label: "தமிழ்", code: "ta-IN" },
-  { label: "ಕನ್ನಡ", code: "kn-IN" }, { label: "മലയാളം", code: "ml-IN" },
-  { label: "मराठी", code: "mr-IN" }, { label: "বাংলা", code: "bn-IN" },
-  { label: "ગુજરાતી", code: "gu-IN" }, { label: "ਪੰਜਾਬੀ", code: "pa-IN" }
-];
+const LANGUAGES = [{label:"Auto",code:"auto"},{label:"English",code:"en-IN"},{label:"తెలుగు",code:"te-IN"},{label:"हिन्दी",code:"hi-IN"},{label:"தமிழ்",code:"ta-IN"},{label:"ಕನ್ನಡ",code:"kn-IN"},{label:"മലയാളം",code:"ml-IN"},{label:"मराठी",code:"mr-IN"},{label:"বাংলা",code:"bn-IN"},{label:"ગુજરાતી",code:"gu-IN"}];
+const CONDITIONS = ["Diabetes","High triglycerides","Cholesterol","Blood pressure","Kidney health"];
+const FRUITS = [{emoji:"🥭",name:"Mango",q:"Can I eat mango?"},{emoji:"🍈",name:"Papaya",q:"Is papaya a good choice for me?"},{emoji:"🍐",name:"Guava",q:"Tell me about guava."},{emoji:"🍌",name:"Banana",q:"Can I eat banana?"}];
 const WEBHOOK_URL = process.env.EXPO_PUBLIC_N8N_WEBHOOK_URL ?? "";
-type Advice = { fruit?: string; gi?: number; gl?: number; season?: string; best_time?: string; diabetic_safety?: string; pairing_tip?: string; portion?: string; renal_safety?: string; potassium?: number; hypertension_safety?: string; ckd_safety?: string; spoken_response?: string; audio_url?: string; image_url?: string; description?: string; language_code?: string; language?: string; [key: string]: unknown };
-function normalizeResponse(raw: any): Advice | null {
-  let value = raw;
-  for (let i = 0; i < 4; i++) {
-    if (typeof value === "string") { try { value = JSON.parse(value); } catch { return null; } continue; }
-    if (Array.isArray(value)) { value = value[0]; continue; }
-    if (value && typeof value === "object" && !("fruit" in value) && !("spoken_response" in value)) {
-      const inner = value.output ?? value.json ?? value.data ?? value.body;
-      if (inner !== undefined) { value = inner; continue; }
-    }
-    break;
-  }
-  return value && typeof value === "object" && Object.keys(value).length ? value as Advice : null;
+type Advice = {fruit?:string;gi?:number|string|null;gl?:number|string|null;season?:string;best_time?:string;diabetic_safety?:string;pairing_tip?:string;portion?:string;renal_safety?:string;ckd_safety?:string;potassium?:number|string;hypertension_safety?:string;spoken_response?:string;audio_url?:string;image_url?:string;description?:string;[key:string]:unknown};
+function normalize(raw:any):Advice|null {let v=raw;for(let i=0;i<5;i++){if(typeof v==="string"){try{v=JSON.parse(v)}catch{return null}continue}if(Array.isArray(v)){v=v[0];continue}if(v&&typeof v==="object"&&!v.fruit&&!v.spoken_response){const x=v.output??v.json??v.data??v.body;if(x!==undefined){v=x;continue}}break}return v&&typeof v==="object"&&Object.keys(v).length?v:null}
+const has=(v:unknown)=>v!==undefined&&v!==null&&String(v).trim()!==""&&String(v).toLowerCase()!=="n/a";
+
+export default function App(){
+ const [language,setLanguage]=useState(LANGUAGES[0]),[question,setQuestion]=useState(""),[conditions,setConditions]=useState<string[]>([]),[answer,setAnswer]=useState<Advice|null>(null),[loading,setLoading]=useState(false),[listening,setListening]=useState(false),[error,setError]=useState(""),[tab,setTab]=useState("Home");
+ const session=useRef("fb-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,10));
+ useSpeechRecognitionEvent("start",()=>setListening(true));useSpeechRecognitionEvent("end",()=>setListening(false));useSpeechRecognitionEvent("result",e=>{const t=e.results?.[0]?.transcript;if(t)setQuestion(t)});useSpeechRecognitionEvent("error",e=>{setListening(false);setError(e.message||"Voice input unavailable.")});
+ const lang=useMemo(()=>language.code,[language]);
+ const toggle=(c:string)=>setConditions(p=>p.includes(c)?p.filter(x=>x!==c):[...p,c]);
+ async function ask(prompt?:string){const q=(prompt??question).trim();if(!q)return;if(!WEBHOOK_URL){setError("Connect the n8n webhook in your app environment before asking.");return}setQuestion(q);setLoading(true);setError("");setAnswer(null);try{const r=await fetch(WEBHOOK_URL,{method:"POST",headers:{"Content-Type":"application/json","ngrok-skip-browser-warning":"true"},body:JSON.stringify({query:q,language:lang,session_id:session.current,user_conditions:conditions})});if(!r.ok)throw new Error("FruitBuddie couldn't respond ("+r.status+").");const d=normalize(await r.text());if(!d)throw new Error("The response could not be read. Please try again.");setAnswer(d);setTab("Ask")}catch(e){setError(e instanceof Error?e.message:"Something went wrong.")}finally{setLoading(false)}}
+ async function voice(){setError("");try{const p=await ExpoSpeechRecognitionModule.requestPermissionsAsync();if(!p.granted){setError("Allow microphone access to ask by voice.");return}ExpoSpeechRecognitionModule.start({lang:lang==="auto"?"en-IN":lang,interimResults:true,continuous:false})}catch(e){setError(e instanceof Error?e.message:"Voice input unavailable.")}}
+ async function play(){if(!answer?.audio_url||typeof answer.audio_url!=="string")return;try{const {sound}=await Audio.Sound.createAsync({uri:answer.audio_url});await sound.playAsync()}catch{setError("Audio playback failed.")}}
+ const rows:[string,unknown,string][]=[["Diabetes guidance",answer?.diabetic_safety,"🩸"],["Suggested portion",answer?.portion,"🥣"],["Best time",answer?.best_time,"☀️"],["Season in India",answer?.season,"🌤"],["Pairing idea",answer?.pairing_tip,"🥜"],["Kidney considerations",answer?.renal_safety??answer?.ckd_safety,"💧"],["Blood pressure",answer?.hypertension_safety,"💚"]];
+ return <SafeAreaView style={s.safe}><StatusBar barStyle="light-content" backgroundColor="#123B2D"/>
+ <View style={s.top}><View style={s.topRow}><View style={s.brandRow}><View style={s.logo}><Text style={{fontSize:22}}>🍃</Text></View><View><Text style={s.brand}>fruitbuddie</Text><Text style={s.brandSub}>YOUR DAILY FRUIT COMPANION</Text></View></View><TouchableOpacity style={s.lang} onPress={()=>setLanguage(LANGUAGES[(LANGUAGES.findIndex(x=>x.code===lang)+1)%LANGUAGES.length])}><Text style={s.langText}>文  {language.label}⌄</Text></TouchableOpacity></View>
+ <View style={s.hero}><View style={{flex:1}}><Text style={s.eyebrow}>A FRESHER WAY TO EAT WELL</Text><Text style={s.heroTitle}>Good choices.{"\n"}One fruit at a time.</Text><Text style={s.heroSub}>Personalised fruit guidance that keeps your health in mind.</Text></View><View style={s.heroFruit}><Text style={{fontSize:55}}>🍊</Text><Text style={s.star}>✦</Text></View></View><View style={s.online}><View style={s.dot}/><Text style={s.onlineText}>Friendly guidance · Rooted in your needs</Text></View></View>
+ <KeyboardAvoidingView style={s.body} behavior={Platform.OS==="ios"?"padding":undefined}><ScrollView contentContainerStyle={s.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+ {tab==="Profile"?<><Text style={s.title}>Your health context</Text><Text style={s.sub}>Choose what you want FruitBuddie to consider.</Text><View style={s.card}><Text style={s.cardTitle}>I want guidance for</Text><Text style={s.sub}>You can update these choices anytime.</Text><View style={s.chips}>{CONDITIONS.map(c=><TouchableOpacity key={c} onPress={()=>toggle(c)} style={[s.condition,conditions.includes(c)&&s.conditionOn]}><Text style={[s.conditionText,conditions.includes(c)&&s.conditionTextOn]}>{conditions.includes(c)?"✓  ":"+  "}{c}</Text></TouchableOpacity>)}</View><Text style={s.note}>These are context preferences, not a diagnosis. For medical advice, speak with your healthcare professional.</Text></View><TouchableOpacity style={s.primary} onPress={()=>setTab("Home")}><Text style={s.primaryText}>Save preferences</Text></TouchableOpacity></>:<>
+ <View style={s.sectionHead}><View><Text style={s.title}>{tab==="Ask"&&answer?"Your fruit insight":"What’s on your mind?"}</Text><Text style={s.sub}>Ask naturally. We’ll keep it simple.</Text></View><View style={s.spark}><Text style={{fontSize:18}}>✦</Text></View></View>
+ <View style={s.card}><View style={s.askHead}><View style={s.askIcon}><Text style={{fontSize:21}}>💬</Text></View><View style={{flex:1}}><Text style={s.cardTitle}>Ask FruitBuddie</Text><Text style={s.sub}>A fruit, a condition, or a nutrition question</Text></View><View style={s.ready}><View style={s.dot}/><Text style={s.readyText}>READY</Text></View></View>
+ <TextInput value={question} onChangeText={setQuestion} placeholder="e.g. Can I eat mango if I have high triglycerides?" placeholderTextColor="#89988E" multiline style={s.input}/>
+ <View style={s.actions}><TouchableOpacity onPress={()=>listening?ExpoSpeechRecognitionModule.stop():voice()} style={[s.mic,listening&&s.micOn]}><Text style={s.micText}>{listening?"■  Stop":"🎙  Speak"}</Text></TouchableOpacity><TouchableOpacity onPress={()=>ask()} disabled={loading||!question.trim()} style={[s.primary,s.submit,(loading||!question.trim())&&s.disabled]}>{loading?<ActivityIndicator color="#fff"/>:<Text style={s.primaryText}>Get guidance  →</Text>}</TouchableOpacity></View>{!!error&&<Text style={s.error}>{error}</Text>}</View>
+ <View style={{marginTop:18}}><Text style={s.mini}>YOUR HEALTH FOCUS</Text><ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.horizontal}>{CONDITIONS.map(c=><TouchableOpacity key={c} onPress={()=>toggle(c)} style={[s.focus,conditions.includes(c)&&s.focusOn]}><Text style={[s.focusText,conditions.includes(c)&&s.focusTextOn]}>{c}</Text></TouchableOpacity>)}</ScrollView></View>
+ {answer?<View style={s.result}><View style={s.resultHead}><View style={{flex:1}}><Text style={s.mini}>YOUR FRUITBUDDIE INSIGHT</Text><Text style={s.resultTitle}>{String(answer.fruit??"Your fruit guide")}</Text></View><View style={s.resultBadge}><Text style={{fontSize:25}}>🍃</Text></View></View>{!!answer.image_url&&typeof answer.image_url==="string"&&<Image source={{uri:answer.image_url}} style={s.image} resizeMode="cover"/>}{!!answer.spoken_response&&<Text style={s.resultBody}>{answer.spoken_response}</Text>}{!!answer.description&&<Text style={s.resultBody}>{answer.description}</Text>}
+ <View style={s.metrics}>{has(answer.gi)&&<View style={s.metric}><Text style={s.metricLabel}>GLYCAEMIC INDEX</Text><Text style={s.metricValue}>{String(answer.gi)}</Text></View>}{has(answer.gl)&&<View style={s.metric}><Text style={s.metricLabel}>GLYCAEMIC LOAD</Text><Text style={s.metricValue}>{String(answer.gl)}</Text></View>}{has(answer.potassium)&&<View style={s.metric}><Text style={s.metricLabel}>POTASSIUM</Text><Text style={s.metricValue}>{String(answer.potassium)}</Text></View>}</View>
+ {rows.filter(([,v])=>has(v)).map(([label,value,emoji])=><View key={label} style={s.detail}><View style={s.detailIcon}><Text>{emoji}</Text></View><View style={{flex:1}}><Text style={s.detailLabel}>{label}</Text><Text style={s.detailValue}>{String(value)}</Text></View></View>)}{!!answer.audio_url&&<TouchableOpacity onPress={play} style={s.listen}><Text style={s.listenText}>▶  Listen to your answer</Text></TouchableOpacity>}<Text style={s.source}>Nutrition values are shown only when supplied by the connected knowledge source. GI and GL can vary by variety, ripeness and serving size.</Text></View>:<View style={{marginTop:20}}><Text style={s.title}>Explore a fruit</Text><Text style={s.sub}>Start with one of these popular picks.</Text><View style={s.fruitGrid}>{FRUITS.map((f,i)=><TouchableOpacity key={f.name} onPress={()=>ask(f.q)} style={s.fruitTile}><View style={[s.fruitOrb,i%2?s.peach:s.mint]}><Text style={{fontSize:34}}>{f.emoji}</Text></View><Text style={s.fruitName}>{f.name}</Text><Text style={s.explore}>Explore  ↗</Text></TouchableOpacity>)}</View></View>}
+ <View style={s.trust}><Text style={{fontSize:20}}>🛡️</Text><View style={{flex:1}}><Text style={s.trustTitle}>Thoughtful, not guesswork.</Text><Text style={s.trustText}>Designed to distinguish known nutrition information from what still needs verification.</Text></View></View>
+ </>}
+ <View style={s.disclaimer}><Text style={s.disclaimerTitle}>A helpful companion, not a doctor.</Text><Text style={s.disclaimerText}>FruitBuddie shares general nutrition information, not medical advice. Check individual dietary choices with a qualified healthcare professional.</Text></View><Text style={s.footer}>MADE WITH CARE  ·  FRUITBUDDIE</Text>
+ </ScrollView></KeyboardAvoidingView>
+ <View style={s.nav}>{[["Home","⌂"],["Ask","✦"],["Profile","♡"]].map(([n,i])=><TouchableOpacity key={n} onPress={()=>setTab(n)} style={s.navItem}><Text style={[s.navIcon,tab===n&&s.navActive]}>{i}</Text><Text style={[s.navLabel,tab===n&&s.navActive]}>{n}</Text></TouchableOpacity>)}</View></SafeAreaView>;
 }
-
-export default function App() {
-  const [language, setLanguage] = useState(LANGUAGES[0]);
-  const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState<Advice | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [listening, setListening] = useState(false);
-  const [error, setError] = useState("");
-  useSpeechRecognitionEvent("start", () => setListening(true));
-  useSpeechRecognitionEvent("end", () => setListening(false));
-  useSpeechRecognitionEvent("result", e => { const t = e.results?.[0]?.transcript; if (t) setQuestion(t); });
-  useSpeechRecognitionEvent("error", e => { setListening(false); setError(e.message || "Speech recognition failed."); });
-  const activeLanguage = useMemo(() => language.code, [language]);
-
-  async function ask() {
-    if (!question.trim()) return;
-    if (!WEBHOOK_URL) { setError("Set EXPO_PUBLIC_N8N_WEBHOOK_URL in .env before asking."); return; }
-    setLoading(true); setError(""); setAnswer(null);
-    try {
-      const res = await fetch(WEBHOOK_URL, { method: "POST", headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" }, body: JSON.stringify({ query: question.trim(), language: activeLanguage }) });
-      if (!res.ok) throw new Error(`Request failed (${res.status}).`);
-      const raw = await res.text();
-      const data = normalizeResponse(raw);
-      if (!data) throw new Error("FruitBuddie returned an answer we couldn't read.");
-      setAnswer(data);
-    } catch (e) { setError(e instanceof Error ? e.message : "Something went wrong."); }
-    finally { setLoading(false); }
-  }
-  async function speak() {
-    setError("");
-    try {
-      const p = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
-      if (!p.granted) { setError("Microphone permission is needed."); return; }
-      ExpoSpeechRecognitionModule.start({ lang: activeLanguage, interimResults: true, continuous: false });
-    } catch (e) { setError(e instanceof Error ? e.message : "Voice input unavailable."); }
-  }
-  async function playAudio() {
-    if (!answer?.audio_url || typeof answer.audio_url !== "string") return;
-    try { const { sound } = await Audio.Sound.createAsync({ uri: answer.audio_url }); await sound.playAsync(); }
-    catch { setError("Audio playback failed."); }
-  }
-
-  return <SafeAreaView style={s.safe}>
-    <StatusBar barStyle="light-content" backgroundColor="#071C17" />
-    <ScrollView contentContainerStyle={s.container} keyboardShouldPersistTaps="handled">
-      <View style={s.brandBlock}><View style={s.mark}><Text style={{fontSize:25}}>🍃</Text></View><Text style={s.brand}>fruitbuddie</Text><Text style={s.tagline}>A little more goodness, every day.</Text></View>
-      <View style={s.hero}><Text style={s.eyebrow}>YOUR EVERYDAY NUTRITION COMPANION</Text><Text style={s.heading}>Make every{"\n"}bite count.</Text><Text style={s.subheading}>Ask about fruits, nutrition and everyday food choices—in the language you’re comfortable with.</Text></View>
-      <View style={s.card}>
-        <Text style={s.label}>CHOOSE YOUR LANGUAGE</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.languages}>
-          {LANGUAGES.map(item => <TouchableOpacity key={item.code} onPress={() => setLanguage(item)} style={[s.chip, language.code === item.code && s.chipActive]}><Text style={[s.chipText, language.code === item.code && s.chipTextActive]}>{item.label}</Text></TouchableOpacity>)}
-        </ScrollView>
-        <Text style={[s.label,{marginTop:16,marginBottom:10}]}>WHAT WOULD YOU LIKE TO KNOW?</Text>
-        <TextInput value={question} onChangeText={setQuestion} placeholder="Ask me about a fruit or nutrition..." placeholderTextColor="#789087" multiline style={s.input}/>
-        <View style={s.actions}>
-          <TouchableOpacity style={[s.voice, listening && s.voiceActive]} onPress={() => listening ? ExpoSpeechRecognitionModule.stop() : speak()}><Text style={s.voiceText}>{listening ? "■ Stop" : "🎙 Speak"}</Text></TouchableOpacity>
-          <TouchableOpacity style={s.ask} onPress={ask} disabled={loading}>{loading ? <ActivityIndicator color="#09251C"/> : <Text style={s.askText}>Ask FruitBuddie  →</Text>}</TouchableOpacity>
-        </View>
-      </View>
-      {!!error && <Text style={s.error}>{error}</Text>}
-      {answer && <View style={s.answer}>
-        <Text style={s.eyebrow}>YOUR FRUITBUDDIE INSIGHT</Text>
-        <Text style={s.answerTitle}>{String(answer.fruit ?? "Your fruit insight")}</Text>
-        {!!answer.description && <Text style={s.answerBody}>{answer.description}</Text>}
-        <View style={s.metrics}>
-          {answer.gi !== undefined && <View style={s.metric}><Text style={s.metricLabel}>GLYCAEMIC INDEX</Text><Text style={s.metricValue}>{answer.gi}</Text></View>}
-          {answer.gl !== undefined && <View style={s.metric}><Text style={s.metricLabel}>GLYCAEMIC LOAD</Text><Text style={s.metricValue}>{answer.gl}</Text></View>}
-          {answer.potassium !== undefined && <View style={s.metric}><Text style={s.metricLabel}>POTASSIUM</Text><Text style={s.metricValue}>{answer.potassium}</Text></View>}
-        </View>
-        {([["DIABETES", answer.diabetic_safety], ["PORTION", answer.portion], ["BEST TIME", answer.best_time], ["SEASON", answer.season], ["PAIRING TIP", answer.pairing_tip], ["KIDNEY / RENAL SAFETY", answer.renal_safety ?? answer.ckd_safety], ["BLOOD PRESSURE", answer.hypertension_safety]] as const).filter(([,v]) => !!v).map(([label,value]) => <View key={label} style={s.list}><Text style={s.label}>{label}</Text><Text style={s.bullet}>{String(value)}</Text></View>)}
-        {!!answer.spoken_response && <Text style={s.answerBody}>{answer.spoken_response}</Text>}
-        {!!answer.audio_url && <TouchableOpacity style={s.audio} onPress={playAudio}><Text style={s.audioText}>▶  Listen to the answer</Text></TouchableOpacity>}
-      </View>}
-      <View style={s.disclaimer}><Text style={s.disclaimerTitle}>A helpful companion, not a doctor.</Text><Text style={s.disclaimerText}>FruitBuddie provides general nutrition information, not medical advice. For personal dietary needs or medical conditions, consult a qualified healthcare professional.</Text></View>
-      <Text style={s.footer}>MADE WITH CARE  ·  FRUITBUDDIE</Text>
-    </ScrollView>
-  </SafeAreaView>;
-}
-const s = StyleSheet.create({
- safe:{flex:1,backgroundColor:"#071C17"}, container:{padding:22,paddingBottom:40},
- brandBlock:{alignItems:"center",paddingTop:18,paddingBottom:28}, mark:{width:48,height:48,borderRadius:16,backgroundColor:"#153C2F",alignItems:"center",justifyContent:"center",marginBottom:10},
- brand:{color:"#F3E9C8",fontSize:25,fontWeight:"800"},tagline:{color:"#9FB7A9",fontSize:12,marginTop:5},
- hero:{marginBottom:24},eyebrow:{color:"#D4B96D",fontSize:10,fontWeight:"800",letterSpacing:2},heading:{color:"#F6F2E6",fontSize:43,lineHeight:48,fontWeight:"800",marginTop:12},
- subheading:{color:"#B6C9BE",fontSize:14,lineHeight:22,marginTop:12,maxWidth:330},
- card:{backgroundColor:"#102B22",borderColor:"#24483A",borderWidth:1,borderRadius:22,padding:18},label:{color:"#D4B96D",fontSize:10,fontWeight:"800",letterSpacing:1.4},
- languages:{gap:8,paddingVertical:13},chip:{borderWidth:1,borderColor:"#365848",borderRadius:18,paddingHorizontal:13,paddingVertical:9},chipActive:{backgroundColor:"#D8C27F",borderColor:"#D8C27F"},
- chipText:{color:"#D3E0D7",fontSize:12,fontWeight:"600"},chipTextActive:{color:"#10271E"},
- input:{minHeight:105,color:"#F5F2E9",backgroundColor:"#0A211A",borderColor:"#315544",borderWidth:1,borderRadius:14,padding:14,fontSize:15,textAlignVertical:"top"},
- actions:{flexDirection:"row",gap:10,marginTop:14},voice:{borderColor:"#557565",borderWidth:1,borderRadius:13,paddingHorizontal:16,minHeight:48,justifyContent:"center"},voiceActive:{borderColor:"#D8C27F",backgroundColor:"#2A3D2C"},voiceText:{color:"#E3EBDD",fontWeight:"700",fontSize:13},
- ask:{flex:1,backgroundColor:"#D8C27F",borderRadius:13,minHeight:48,justifyContent:"center",alignItems:"center",paddingHorizontal:10},askText:{color:"#10271E",fontWeight:"800",fontSize:13},
- error:{color:"#FFB6A8",marginTop:14,lineHeight:20},answer:{marginTop:20,padding:20,borderRadius:20,backgroundColor:"#15352A",borderWidth:1,borderColor:"#41644F"},
- answerTitle:{color:"#F4EEDC",fontSize:23,fontWeight:"800",marginTop:10},answerBody:{color:"#D6E1D8",fontSize:14,lineHeight:22,marginTop:12},list:{marginTop:17},bullet:{color:"#D6E1D8",fontSize:13,lineHeight:21,marginTop:4},
- metrics:{flexDirection:"row",flexWrap:"wrap",gap:8,marginTop:16},metric:{backgroundColor:"#0D261E",borderRadius:12,padding:12,minWidth:90},metricLabel:{color:"#AFC2B6",fontSize:9,fontWeight:"700"},metricValue:{color:"#F4EEDC",fontSize:20,fontWeight:"800",marginTop:4},audio:{alignSelf:"flex-start",marginTop:18,borderRadius:20,backgroundColor:"#D8C27F",paddingHorizontal:15,paddingVertical:10},audioText:{color:"#10271E",fontWeight:"800",fontSize:12},
- disclaimer:{marginTop:25,padding:16,borderLeftWidth:2,borderLeftColor:"#C9B36F",backgroundColor:"#0D261E"},disclaimerTitle:{color:"#E7D8AA",fontSize:12,fontWeight:"800",marginBottom:6},disclaimerText:{color:"#AFC2B6",fontSize:11,lineHeight:18},
- footer:{color:"#607D6D",textAlign:"center",fontSize:9,letterSpacing:2,marginTop:24}
+const shadow=Platform.select({ios:{shadowColor:"#153D2E",shadowOpacity:0.1,shadowRadius:18,shadowOffset:{width:0,height:8}},android:{elevation:4}});
+const s=StyleSheet.create({
+ safe:{flex:1,backgroundColor:"#F5F6F0"},top:{backgroundColor:"#123B2D",paddingHorizontal:21,paddingTop:12,paddingBottom:20,borderBottomLeftRadius:28,borderBottomRightRadius:28},
+ topRow:{flexDirection:"row",alignItems:"center",justifyContent:"space-between"},brandRow:{flexDirection:"row",alignItems:"center",gap:10},logo:{width:42,height:42,borderRadius:15,backgroundColor:"#245642",alignItems:"center",justifyContent:"center"},brand:{color:"#F8F5E9",fontSize:20,fontWeight:"900"},brandSub:{color:"#B9D0C1",fontSize:8,fontWeight:"800",letterSpacing:1.4,marginTop:2},
+ lang:{backgroundColor:"#24513E",paddingHorizontal:12,paddingVertical:9,borderRadius:18,borderWidth:1,borderColor:"#47745C"},langText:{color:"#F2F2E8",fontSize:11,fontWeight:"700"},
+ hero:{flexDirection:"row",alignItems:"center",marginTop:23},eyebrow:{color:"#D9C987",fontSize:9,fontWeight:"900",letterSpacing:1.6},heroTitle:{color:"#FFFDF4",fontSize:29,lineHeight:35,fontWeight:"900",marginTop:8,letterSpacing:-0.6},heroSub:{color:"#C2D6C9",fontSize:12,lineHeight:18,marginTop:8,maxWidth:235},
+ heroFruit:{width:94,height:94,borderRadius:32,backgroundColor:"#F0C66E",alignItems:"center",justifyContent:"center",transform:[{rotate:"7deg"}]},star:{position:"absolute",right:2,top:1,color:"#A66B22",fontSize:20},online:{flexDirection:"row",alignItems:"center",gap:8,marginTop:17},dot:{width:7,height:7,borderRadius:4,backgroundColor:"#9DCE82"},onlineText:{color:"#C2D6C9",fontSize:10,fontWeight:"600"},
+ body:{flex:1},content:{paddingHorizontal:18,paddingTop:19,paddingBottom:25},sectionHead:{flexDirection:"row",alignItems:"center",justifyContent:"space-between",marginBottom:13},title:{color:"#173C2E",fontSize:20,fontWeight:"900",letterSpacing:-0.4},sub:{color:"#718078",fontSize:11,marginTop:4,lineHeight:16},spark:{width:34,height:34,borderRadius:12,backgroundColor:"#E8EFE5",alignItems:"center",justifyContent:"center"},
+ card:{backgroundColor:"#FFFFFF",borderRadius:22,padding:16,borderWidth:1,borderColor:"#E8EDE5",...shadow},askHead:{flexDirection:"row",alignItems:"center",gap:10,marginBottom:14},askIcon:{width:42,height:42,borderRadius:14,backgroundColor:"#EAF2E9",alignItems:"center",justifyContent:"center"},cardTitle:{color:"#173C2E",fontSize:14,fontWeight:"900"},ready:{flexDirection:"row",alignItems:"center",gap:5,backgroundColor:"#F0F6EB",padding:7,borderRadius:12},readyText:{color:"#47734D",fontSize:8,fontWeight:"900"},
+ input:{minHeight:90,maxHeight:150,backgroundColor:"#F7F9F5",borderWidth:1,borderColor:"#E3EAE0",borderRadius:15,padding:13,color:"#173C2E",fontSize:13,lineHeight:19,textAlignVertical:"top"},actions:{flexDirection:"row",gap:9,marginTop:12},mic:{minHeight:47,paddingHorizontal:15,borderRadius:13,borderWidth:1,borderColor:"#DCE6DA",justifyContent:"center",alignItems:"center",backgroundColor:"#F9FBF7"},micOn:{backgroundColor:"#FCEBE5",borderColor:"#E9B9A8"},micText:{color:"#315B43",fontSize:12,fontWeight:"800"},primary:{backgroundColor:"#1D6848",borderRadius:13,minHeight:47,justifyContent:"center",alignItems:"center",paddingHorizontal:16,...shadow},submit:{flex:1},primaryText:{color:"#FFFFFF",fontSize:12,fontWeight:"900"},disabled:{opacity:0.45},error:{color:"#B13F32",fontSize:11,lineHeight:17,marginTop:10},
+ mini:{color:"#849187",fontSize:9,fontWeight:"900",letterSpacing:1.3},horizontal:{gap:7,paddingVertical:10},focus:{paddingHorizontal:12,paddingVertical:8,borderRadius:15,backgroundColor:"#EAEFE7",borderWidth:1,borderColor:"#E0E7DD"},focusOn:{backgroundColor:"#DCEBDD",borderColor:"#8CB292"},focusText:{color:"#5B6E60",fontSize:10,fontWeight:"700"},focusTextOn:{color:"#245A3B"},
+ fruitGrid:{flexDirection:"row",flexWrap:"wrap",gap:10,marginTop:12},fruitTile:{width:"48%",backgroundColor:"#FFFFFF",borderRadius:18,padding:13,borderWidth:1,borderColor:"#E8EDE5",...shadow},fruitOrb:{width:57,height:57,borderRadius:20,alignItems:"center",justifyContent:"center",marginBottom:10},mint:{backgroundColor:"#E4F0DF"},peach:{backgroundColor:"#FBEBD9"},fruitName:{color:"#1D4332",fontSize:14,fontWeight:"900"},explore:{color:"#6D8A70",fontSize:10,fontWeight:"700",marginTop:4},
+ result:{backgroundColor:"#FFFFFF",borderRadius:22,padding:17,borderWidth:1,borderColor:"#E5EBE2",...shadow,marginTop:4},resultHead:{flexDirection:"row",alignItems:"center"},resultTitle:{color:"#173C2E",fontSize:25,fontWeight:"900",marginTop:5},resultBadge:{width:50,height:50,borderRadius:18,backgroundColor:"#E8F1E5",alignItems:"center",justifyContent:"center"},image:{width:"100%",height:170,borderRadius:16,marginTop:14,backgroundColor:"#EDF2E9"},resultBody:{color:"#465A4D",fontSize:13,lineHeight:21,marginTop:14},
+ metrics:{flexDirection:"row",flexWrap:"wrap",gap:8,marginTop:15},metric:{flexGrow:1,minWidth:"30%",backgroundColor:"#F0F5ED",borderRadius:13,padding:11},metricLabel:{color:"#758477",fontSize:8,fontWeight:"900",letterSpacing:0.7},metricValue:{color:"#1B563A",fontSize:20,fontWeight:"900",marginTop:5},
+ detail:{flexDirection:"row",alignItems:"flex-start",gap:10,paddingVertical:12,borderBottomWidth:1,borderBottomColor:"#EEF1EB"},detailIcon:{width:34,height:34,borderRadius:12,backgroundColor:"#F1F5EF",alignItems:"center",justifyContent:"center"},detailLabel:{color:"#829087",fontSize:9,fontWeight:"900",letterSpacing:0.7},detailValue:{color:"#294B38",fontSize:12,lineHeight:18,fontWeight:"600",marginTop:4},listen:{backgroundColor:"#1D6848",alignSelf:"flex-start",paddingHorizontal:16,paddingVertical:11,borderRadius:20,marginTop:15},listenText:{color:"#FFFFFF",fontSize:11,fontWeight:"800"},source:{color:"#929D93",fontSize:9,lineHeight:14,marginTop:15},
+ trust:{flexDirection:"row",gap:11,backgroundColor:"#E9F1E6",padding:14,borderRadius:17,marginTop:20,borderWidth:1,borderColor:"#DCE8D8"},trustTitle:{color:"#28543A",fontSize:12,fontWeight:"900"},trustText:{color:"#657A68",fontSize:10,lineHeight:15,marginTop:4},
+ chips:{flexDirection:"row",flexWrap:"wrap",gap:9,marginTop:17},condition:{borderWidth:1,borderColor:"#DDE6DA",backgroundColor:"#F8FAF6",borderRadius:15,paddingHorizontal:12,paddingVertical:11},conditionOn:{backgroundColor:"#E2F0E0",borderColor:"#8EB58F"},conditionText:{color:"#607365",fontSize:11,fontWeight:"700"},conditionTextOn:{color:"#24583A"},note:{color:"#8A968C",fontSize:10,lineHeight:16,marginTop:18},
+ disclaimer:{marginTop:22,padding:15,borderRadius:15,backgroundColor:"#EEF2E9",borderLeftWidth:3,borderLeftColor:"#C3A95C"},disclaimerTitle:{color:"#456346",fontSize:11,fontWeight:"900",marginBottom:5},disclaimerText:{color:"#778478",fontSize:10,lineHeight:16},footer:{color:"#A1AAA0",fontSize:8,letterSpacing:1.8,textAlign:"center",marginTop:20},
+ nav:{height:64,backgroundColor:"#FFFFFF",borderTopWidth:1,borderTopColor:"#E8EDE6",flexDirection:"row",justifyContent:"space-around",alignItems:"center",paddingBottom:4},navItem:{alignItems:"center",justifyContent:"center",minWidth:65},navIcon:{fontSize:20,color:"#9BA69A"},navLabel:{fontSize:9,color:"#9BA69A",fontWeight:"700",marginTop:2},navActive:{color:"#1D6848"}
 });
