@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#f5f6f0">
-<title>FruitBuddie — Your everyday fruit companion</title>
+<title>FruitBuddie — Personalised fruit guidance for your health</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -194,20 +194,40 @@ body{padding:0;background:radial-gradient(ellipse at 12% 0%,#dff1df 0,transparen
  .report-facts,.report-sources{grid-template-columns:1fr}
  .disclaimer{margin-top:16px;font-size:9px}
 }
+
+/* Personalised health companion experience */
+.hero{min-height:285px;padding-right:clamp(220px,28vw,360px)}
+.hero h1{max-width:720px}.hero p{max-width:650px}
+.hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;position:relative;z-index:1}
+.hero-tags span{border:1px solid #ffffff42;background:#ffffff15;color:#efffe8;padding:8px 12px;border-radius:30px;font-size:11px;font-weight:700}
+.workspace{grid-template-columns:minmax(0,1fr) 330px}.main-card{padding:26px}
+.context{margin-top:0;border:1px solid #e0e9df;background:#f8fbf7}
+.context summary{font-size:13px;color:#28553e}.condition-options{padding-top:2px}
+.question-heading{display:flex;flex-direction:column;gap:5px;margin:24px 0 10px}
+.question-heading span{font-size:10px;font-weight:800;letter-spacing:1.3px;color:#52745d}
+.question-heading small{font-size:11px;color:#8a998d}
+.ask{background:#f8fbf8;border:1px solid #e0e9df}.primary{font-size:12px;padding:14px 17px}
+.examples{margin-top:22px}.report-empty{background:linear-gradient(135deg,#f0f7ed,#f8fbf6);border:1px dashed #cbdcc8}
+.report-empty .symbol{background:#e1f0dd;color:#276b4c}.report-empty h2{font-size:15px}
+.report-empty p{font-size:11px;max-width:390px;margin:0 auto;line-height:1.7}
+.side-card h2 em{color:#23916a;font-style:normal}
+@media(max-width:850px){.hero{min-height:255px;padding:30px 28px 32px}.workspace{grid-template-columns:1fr}.main-card{padding:20px}}
+@media(max-width:520px){.hero{min-height:0;padding:24px 20px 22px}.hero h1{font-size:34px;max-width:280px}.hero p{max-width:300px;font-size:12px}.hero-tags{gap:6px;margin-top:15px}.hero-tags span{font-size:9px;padding:6px 9px}.main-card{padding:15px}.question-heading{margin-top:20px}.question-heading span{font-size:9px}.primary{font-size:10px;padding:12px 12px}.context summary{padding:13px 12px}.condition-options{padding:0 10px 12px}}
+
 </style></head>
 <body><main class="app">
-<header class="topbar"><div class="brand"><span class="brand-mark">✳</span>FruitBuddie</div><div class="top-note"><span class="live-dot"></span> A little more confident, every day</div><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode">☾ Dark</button></header>
-<section class="hero"><span class="eyebrow">✦ YOUR EVERYDAY FRUIT COMPANION</span><h1>Good choices start<br>with <em>good fruit.</em></h1><p>Wondering if a fruit fits your health needs? Just ask. We'll make the answer simple, practical and personal.</p></section>
+<header class="topbar"><div class="brand"><span class="brand-mark">✳</span>FruitBuddie</div><div class="top-note"><span class="live-dot"></span> Personalised nutrition · Voice first</div><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode">☾ Dark</button></header>
+<section class="hero"><span class="eyebrow">✦ YOUR PERSONAL FRUIT & HEALTH COMPANION</span><h1>Eat fruits that work<br><em>for your health.</em></h1><p>Diabetes, cholesterol, high triglycerides or kidney concerns? Tell FruitBuddie about your health, then ask by voice or text. Get fruit guidance shaped around you.</p><div class="hero-tags"><span>Diabetes</span><span>Cholesterol</span><span>Triglycerides</span><span>Kidney health</span></div></section>
 <div class="workspace"><section class="main-card">
-<div class="card-label"><span>Ask FruitBuddie</span><small>Text or voice · replies in your language</small></div>
-<section class="ask"><form id="ask-form"><div class="prompt"><input id="question-input" type="text" placeholder="Can I eat mango with my health condition?" autocomplete="off" required></div><div class="prompt-bottom"><div class="answer-language">✧ We'll reply in the language you use</div><div><button class="mic-button" id="mic-button" type="button" aria-label="Start voice input" title="Speak your question"><svg viewBox="0 0 24 24"><rect x="9" y="2.5" width="6" height="12" rx="3"></rect><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3.5M8.5 21.5h7"></path></svg></button><button class="primary" id="ask-button" type="submit">Ask now ↗</button></div></div><p id="voice-status" class="voice-status"></p></form></section>
-<details class="context"><summary><span>＋ Add your health context</span><span style="font-weight:400;color:#98a397">Optional · choose any</span></summary><div class="condition-options">
+<div class="card-label"><span>Your health profile</span><small>Choose the conditions that apply</small></div>
+<section class="ask"><form id="ask-form"><div class="prompt"><input id="question-input" type="text" placeholder="e.g. Can I eat mango with high triglycerides?" autocomplete="off" required></div><div class="prompt-bottom"><div class="answer-language">✧ We'll reply in the language you use</div><div><button class="mic-button" id="mic-button" type="button" aria-label="Start voice input" title="Speak your question"><svg viewBox="0 0 24 24"><rect x="9" y="2.5" width="6" height="12" rx="3"></rect><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3.5M8.5 21.5h7"></path></svg></button><button class="primary" id="ask-button" type="submit">Get my fruit guidance ↗</button></div></div><p id="voice-status" class="voice-status"></p></form></section>
+<details class="context" open><summary><span>♡ Your health conditions</span><span style="font-weight:400;color:#98a397">Select all that apply</span></summary><div class="condition-options">
 <label class="condition-chip"><input type="checkbox" name="condition" value="Diabetes"><span>Diabetes</span></label><label class="condition-chip"><input type="checkbox" name="condition" value="Prediabetes"><span>Prediabetes</span></label><label class="condition-chip"><input type="checkbox" name="condition" value="High triglycerides"><span>High triglycerides</span></label><label class="condition-chip"><input type="checkbox" name="condition" value="High cholesterol"><span>High cholesterol</span></label><label class="condition-chip"><input type="checkbox" name="condition" value="Hypertension"><span>High blood pressure</span></label><label class="condition-chip"><input type="checkbox" name="condition" value="Chronic kidney disease"><span>Kidney condition</span></label><label class="condition-chip"><input type="checkbox" name="condition" value="Fatty liver"><span>Fatty liver</span></label><label class="condition-chip"><input type="checkbox" name="condition" value="Gout"><span>Gout</span></label><label class="condition-chip"><input type="checkbox" name="condition" value="IBS"><span>IBS</span></label>
 </div></details>
-<div class="examples"><div class="examples-head"><b>Or explore a fruit</b><span>Tap to ask</span></div><div class="fruit-list"><button class="fruit-choice" data-fruit="Guava"><span class="fruit-thumb">🍈</span><span class="fruit-name">Guava</span></button><button class="fruit-choice" data-fruit="Mango"><span class="fruit-thumb">🥭</span><span class="fruit-name">Mango</span></button><button class="fruit-choice" data-fruit="Jamun"><span class="fruit-thumb">🫐</span><span class="fruit-name">Jamun</span></button><button class="fruit-choice" data-fruit="Papaya"><span class="fruit-thumb">🍈</span><span class="fruit-name">Papaya</span></button><button class="fruit-choice" data-fruit="Orange"><span class="fruit-thumb">🍊</span><span class="fruit-name">Orange</span></button></div></div>
-<div id="report-empty" class="report-empty"><div class="symbol">✿</div><h2>Your fruit guide will appear here</h2><p>Ask a question to get a clear view of portions, nutrition and what matters for your health.</p></div><div id="ask-result" class="answer" aria-live="polite"></div>
+<div class="question-heading"><span>NOW ASK YOUR PERSONAL FRUIT GUIDE</span><small>Voice or text · automatic language detection</small></div><div class="fruit-list"><button class="fruit-choice" data-fruit="Guava"><span class="fruit-thumb">🍈</span><span class="fruit-name">Guava</span></button><button class="fruit-choice" data-fruit="Mango"><span class="fruit-thumb">🥭</span><span class="fruit-name">Mango</span></button><button class="fruit-choice" data-fruit="Jamun"><span class="fruit-thumb">🫐</span><span class="fruit-name">Jamun</span></button><button class="fruit-choice" data-fruit="Papaya"><span class="fruit-thumb">🍈</span><span class="fruit-name">Papaya</span></button><button class="fruit-choice" data-fruit="Orange"><span class="fruit-thumb">🍊</span><span class="fruit-name">Orange</span></button></div></div>
+<div id="report-empty" class="report-empty"><div class="symbol">♡</div><h2>Your health-aware fruit guide starts here</h2><p>Select your health conditions above, then ask whether a fruit is suitable for you, what portion may fit, and what to watch out for.</p></div><div id="ask-result" class="answer" aria-live="polite"></div>
 </section>
-<aside class="side-card"><div class="side-kicker">A SIMPLER WAY TO EAT WELL</div><h2>Clear answers.<br>Less guesswork.</h2><p>Small everyday decisions can feel complicated when health is involved. Let's make them easier.</p><div class="benefit-list"><div class="benefit"><span class="benefit-icon">♡</span><div><b>Your health comes first</b><span>Guidance considers the health context you share.</span></div></div><div class="benefit"><span class="benefit-icon">◷</span><div><b>Practical, not preachy</b><span>Simple portions and useful everyday tips.</span></div></div><div class="benefit"><span class="benefit-icon">✧</span><div><b>Evidence-aware</b><span>Sources and uncertainty are made clear.</span></div></div><div class="benefit"><span class="benefit-icon">◖</span><div><b>Speak naturally</b><span>Ask in your language, by voice or text.</span></div></div></div></aside></div>
+<aside class="side-card"><div class="side-kicker">MORE THAN A FRUIT ASSISTANT</div><h2>Fruit advice that<br>starts with <em>you.</em></h2><p>FruitBuddie considers the health conditions you share, so fruit choices are explained in your context—not with generic good-or-bad labels.</p><div class="benefit-list"><div class="benefit"><span class="benefit-icon">♡</span><div><b>Your health comes first</b><span>Guidance considers the health context you share.</span></div></div><div class="benefit"><span class="benefit-icon">◷</span><div><b>Practical, not preachy</b><span>Simple portions and useful everyday tips.</span></div></div><div class="benefit"><span class="benefit-icon">✧</span><div><b>Evidence-aware</b><span>Sources and uncertainty are made clear.</span></div></div><div class="benefit"><span class="benefit-icon">◖</span><div><b>Speak naturally</b><span>Ask in your language, by voice or text.</span></div></div></div></aside></div>
 <p class="disclaimer">FruitBuddie shares general nutrition information, not a medical diagnosis or a replacement for advice from your doctor or dietitian.</p>
 </main><script>
 (()=>{
