@@ -229,10 +229,128 @@ body{padding:0;background:radial-gradient(ellipse at 12% 0%,#dff1df 0,transparen
 @media(max-width:850px){.fruit-list{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.fruit-photo{height:115px}}
 @media(max-width:520px){.fruit-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.fruit-choice{padding:7px;border-radius:15px}.fruit-photo{height:125px}.fruit-name{font-size:13px;padding-top:10px}.fruit-cta{font-size:9px}}
 
+
+/* FruitBuddie product redesign v2 */
+:root{--ink:#172c25;--muted:#718078;--green:#155b43;--green-2:#207a5a;--mint:#e8f3ec;--lime:#d8f18c;--paper:#f4f6f1;--line:#e4eae3;--shadow:0 18px 50px rgba(24,57,40,.075)}
+html,body{background:var(--paper);color:var(--ink)}
+body{font-family:"DM Sans",sans-serif}
+.app{max-width:1380px;padding:30px clamp(20px,4.5vw,68px) 54px}
+.topbar{height:52px;margin-bottom:26px}
+.brand{font:800 21px Manrope,sans-serif;letter-spacing:-.8px;color:#173c2d}
+.brand-mark{width:39px;height:39px;border-radius:13px;background:#155b43;color:#e4f6bc;font-size:20px;box-shadow:0 7px 16px #155b4325}
+.top-note{margin-left:auto;font-size:11px;color:#78877e}
+.live-dot{background:#32a879;box-shadow:0 0 0 4px #32a87919}
+.theme-toggle{border:1px solid #dce5dc;background:#fff;color:#315342;border-radius:30px;padding:9px 14px;font-size:10px}
+.hero{min-height:300px;margin:0 0 22px;padding:clamp(30px,5vw,62px);border-radius:28px;background:linear-gradient(112deg,#102f25 0%,#155b43 58%,#237b59 100%);box-shadow:0 22px 54px #153f2b24;display:flex;align-items:center;justify-content:space-between;gap:28px;text-align:left;position:relative;overflow:hidden}
+.hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 78% 46%,#b6e59b18 0,transparent 27%),linear-gradient(90deg,transparent 65%,#ffffff05)}
+.hero:after{display:none}
+.hero-copy{position:relative;z-index:2;max-width:660px}
+.eyebrow{display:flex;align-items:center;gap:9px;padding:0;background:none;color:#d5ee9a;font-size:9px;letter-spacing:2px}
+.eyebrow i{width:7px;height:7px;border-radius:50%;background:#d5ee9a;box-shadow:0 0 0 5px #d5ee9a20}
+.hero h1{margin:18px 0 13px;font:800 clamp(44px,5.3vw,70px)/.99 Manrope,sans-serif;letter-spacing:-3.5px;color:#fff;max-width:650px}
+.hero h1 em{color:#d5ee9a;font-style:normal}
+.hero p{max-width:540px;margin:0;color:#d1e1d7;font-size:15px;line-height:1.75}
+.hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+.hero-tags span{padding:8px 12px;border:1px solid #ffffff2c;border-radius:30px;background:#ffffff0c;color:#e6f0e9;font-size:10px;font-weight:600}
+.hero-orbit{position:relative;z-index:1;flex:0 0 260px;width:260px;height:230px;display:grid;place-items:center}
+.orbit{position:absolute;border:1px solid #d7f09a35;border-radius:50%;transform:rotate(-25deg)}
+.orbit-one{width:205px;height:205px}.orbit-two{width:252px;height:145px;border-color:#d7f09a25;transform:rotate(35deg)}
+.hero-fruit-mark{width:112px;height:112px;border-radius:35px;background:linear-gradient(145deg,#dff29c,#a9d86f);display:grid;place-items:center;color:#174b36;font:800 58px Manrope;letter-spacing:-5px;box-shadow:0 18px 45px #071d1645;transform:rotate(-9deg)}
+.hero-fruit-mark span{font-size:20px;align-self:start;margin:20px 0 0 -2px;letter-spacing:0}
+.orbit-caption{position:absolute;right:-2px;bottom:0;color:#c9e2d1;font-size:8px;line-height:1.5;letter-spacing:1.5px;text-align:right}
+.workspace{grid-template-columns:minmax(0,1fr) 330px;gap:20px;align-items:start}
+.main-card,.side-card{border:1px solid #e3e9e2;border-radius:24px;background:#fff;box-shadow:0 12px 34px #1d422b0b}
+.main-card{padding:clamp(20px,3vw,32px)}
+.card-label{margin-bottom:14px;color:#1f4935;font-size:13px;letter-spacing:0;text-transform:none}
+.card-label small{font-size:10px;color:#8b9990}
+.context{margin:0;border:1px solid #e6ece5;border-radius:17px;background:#fbfcfa}
+.context summary{padding:15px 17px;color:#294f3a;font-size:12px}
+.condition-options{gap:8px;padding:0 15px 16px}
+.condition-chip span{padding:9px 13px;border:1px solid #e1e9e1;background:#fff;color:#65756a;font-size:10px;transition:.18s}
+.condition-chip input:checked+span{background:#e5f3e8;border-color:#8bb89a;color:#185a3d}
+.question-heading{margin:27px 0 11px;gap:6px}
+.question-heading span{color:#527761;font-size:9px;letter-spacing:1.5px}
+.question-heading small{color:#87948b;font-size:11px}
+.ask{padding:8px;border:1px solid #dfe8df;border-radius:18px;background:#f8faf7}
+.ask:focus-within{border-color:#83b497;box-shadow:0 0 0 4px #d9eee0}
+.prompt:before{content:"";display:none}
+.prompt input{padding:13px 12px;font-size:14px}
+.prompt input::placeholder{color:#9aa79e}
+.prompt-bottom{padding:5px 5px 3px 12px}
+.answer-language{font-size:9px;color:#839087}
+.mic-button{width:43px;height:43px;flex-basis:43px;border:1px solid #d7e9dc;background:#eaf5ed;color:#176747}
+.primary{padding:14px 19px;border-radius:12px;background:#176747;font-size:11px;box-shadow:0 7px 15px #17674720}
+.primary:hover{background:#104e37}
+.voice-status{font-size:10px}
+.examples{margin-top:27px}
+.examples-head{margin-bottom:13px}
+.examples-head b{font:700 15px Manrope;color:#1e4231}
+.examples-head span{font-size:10px;color:#89978e}
+.fruit-list{grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.fruit-choice{padding:8px;border:1px solid #e6ece5;border-radius:17px;background:#fff;box-shadow:0 5px 16px #173c2708}
+.fruit-choice:hover,.fruit-choice.active{border-color:#8fb99a;background:#fbfefa;box-shadow:0 12px 24px #173c2712}
+.fruit-photo{height:116px;border-radius:11px;background:linear-gradient(135deg,#eff4eb,#e1ebdf)}
+.fruit-photo img{object-fit:cover}
+.fruit-name{padding:11px 3px 4px;font:700 12px Manrope;color:#254533}
+.fruit-cta{padding:0 3px 4px;font-size:9px;color:#85938a}
+.fruit-cta span{color:#1b8057}
+.report-empty{padding:24px 18px;border:1px dashed #cddbcf;border-radius:18px;background:#f6faf5}
+.report-empty .symbol{background:#e5f2e3;color:#26734d}
+.report-empty h2{font:700 15px Manrope;color:#254b36}
+.report-empty p{font-size:11px;line-height:1.7;color:#819087}
+.side-card{padding:25px;position:sticky;top:22px}
+.side-card:before{background:#e7f1e2}
+.side-kicker{color:#7d9481;font-size:8px;letter-spacing:1.7px}
+.side-card h2{font:800 25px/1.13 Manrope;color:#1b3b2b;letter-spacing:-.9px}
+.side-card h2 em{color:#21805a}
+.side-card>p{font-size:11px;line-height:1.75;color:#7b8980}
+.benefit-list{gap:17px;margin-top:22px}
+.benefit-icon{width:34px;height:34px;flex-basis:34px;border-radius:11px;background:#eaf4e9;color:#26714d}
+.benefit b{font-size:11px;color:#274a35}
+.benefit span{font-size:10px;color:#829087;line-height:1.55}
+.disclaimer{margin-top:22px;color:#8b978f;font-size:10px}
+.answer{gap:12px}
+.report-fruit-hero{border-radius:20px}
+.report-verdict,.condition-result,.report-section,.result-detail,.report-panel,.report-transcript,.report-pairing,.report-best-time,.report-source-note,.report-audio-panel{border-radius:17px}
+html[data-theme="dark"] body{background:#0c1713}
+html[data-theme="dark"] .hero{background:linear-gradient(112deg,#102f25,#155b43 58%,#237b59)}
+html[data-theme="dark"] .hero-orbit .orbit{border-color:#d7f09a35}
+html[data-theme="dark"] .hero p{color:#d1e1d7}
+html[data-theme="dark"] .hero-tags span{color:#e6f0e9}
+@media(max-width:900px){.hero{min-height:260px}.hero-orbit{flex-basis:190px;width:190px;height:190px}.orbit-one{width:160px;height:160px}.orbit-two{width:190px;height:115px}.hero-fruit-mark{width:88px;height:88px;font-size:48px}.workspace{grid-template-columns:1fr}.side-card{position:relative;top:auto}.benefit-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){
+ .app{padding:15px 14px 30px}
+ .topbar{height:44px;margin-bottom:14px}.brand{font-size:18px}.brand-mark{width:35px;height:35px}
+ .top-note{display:none}.theme-toggle{padding:8px 11px}
+ .hero{min-height:0;margin-bottom:14px;padding:25px 21px;border-radius:22px}
+ .hero h1{font-size:39px;letter-spacing:-1.8px;margin:15px 0 10px}
+ .hero p{max-width:310px;font-size:11px;line-height:1.65}
+ .hero-tags{gap:6px;margin-top:17px}.hero-tags span{padding:6px 9px;font-size:8px}
+ .hero-orbit{position:absolute;right:-74px;bottom:-74px;width:190px;height:190px;opacity:.28;pointer-events:none}
+ .hero-fruit-mark{width:84px;height:84px;font-size:44px}
+ .orbit-one{width:155px;height:155px}.orbit-two{width:190px;height:110px}
+ .orbit-caption{display:none}
+ .main-card{padding:16px;border-radius:20px}
+ .card-label{font-size:12px}.card-label small{font-size:9px}
+ .condition-options{gap:6px;padding:0 11px 13px}
+ .condition-chip span{padding:8px 10px;font-size:9px}
+ .question-heading{margin:22px 0 10px}
+ .question-heading small{font-size:10px}
+ .prompt input{font-size:12px;padding:10px}
+ .mic-button{width:39px;height:39px;flex-basis:39px}
+ .primary{padding:12px 13px;font-size:9px}
+ .examples{margin-top:22px}.examples-head{align-items:flex-start;gap:8px}.examples-head b{font-size:13px}.examples-head span{max-width:150px;text-align:right;font-size:9px}
+ .fruit-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .fruit-choice{padding:7px;border-radius:15px}.fruit-photo{height:130px}
+ .fruit-name{font-size:12px}.fruit-cta{font-size:9px}
+ .side-card{display:none}
+ .disclaimer{font-size:9px;line-height:1.6}
+}
+
 </style></head>
 <body><main class="app">
 <header class="topbar"><div class="brand"><span class="brand-mark">✳</span>FruitBuddie</div><div class="top-note"><span class="live-dot"></span> Personalised nutrition · Voice first</div><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode">☾ Dark</button></header>
-<section class="hero"><span class="eyebrow">✦ YOUR PERSONAL FRUIT & HEALTH COMPANION</span><h1>Eat fruits that work<br><em>for your health.</em></h1><p>Diabetes, cholesterol, high triglycerides or kidney concerns? Tell FruitBuddie about your health, then ask by voice or text. Get fruit guidance shaped around you.</p><div class="hero-tags"><span>Diabetes</span><span>Cholesterol</span><span>Triglycerides</span><span>Kidney health</span></div></section>
+<section class="hero"><div class="hero-copy"><span class="eyebrow"><i></i> PERSONAL FRUIT INTELLIGENCE</span><h1>Eat well.<br><em>For your health.</em></h1><p>Fruit choices, understood through your health profile. Ask naturally and get practical, condition-aware guidance.</p><div class="hero-tags"><span>Diabetes</span><span>Cholesterol</span><span>Triglycerides</span><span>Kidney health</span></div></div><div class="hero-orbit" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="hero-fruit-mark">F<span>+</span></div><div class="orbit-caption">YOUR HEALTH<br>COMES FIRST</div></div></section>
 <div class="workspace"><section class="main-card">
 <div class="card-label"><span>Your health profile</span><small>Choose the conditions that apply</small></div>
 <details class="context" open><summary><span>♡ Your health conditions</span><span style="font-weight:400;color:#98a397">Select all that apply</span></summary><div class="condition-options">
